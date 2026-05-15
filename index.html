@@ -5,42 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Pagamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-       .hidden { display: none; }
-    </style>
 </head>
 <body class="bg-gray-100">
-    <!-- Tela de Login -->
-    <div id="loginScreen" class="min-h-screen flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-md w-96">
-            <h1 class="text-2xl font-bold mb-6 text-center">Controle de Pagamento</h1>
-            <input type="password" id="senhaInput" placeholder="Digite a senha" class="w-full p-3 border rounded mb-4">
-            <button onclick="fazerLogin()" class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600">Entrar</button>
-            <p id="erroLogin" class="text-red-500 text-sm mt-2 hidden">Senha incorreta</p>
+    <div id="app" class="min-h-screen">
+        <!-- TELA DE LOGIN -->
+        <div id="loginScreen" class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-8 rounded-lg shadow-md w-96">
+                <h1 class="text-2xl font-bold mb-6 text-center">Controle de Pagamento</h1>
+                <input type="password" id="senha" placeholder="Digite a senha" 
+                       class="w-full p-3 border rounded mb-4">
+                <button onclick="login()" 
+                        class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600">
+                    Entrar
+                </button>
+                <p id="erroLogin" class="text-red-500 text-sm mt-2 hidden">Senha incorreta</p>
+            </div>
         </div>
-    </div>
 
-    <!-- Tela Principal -->
-    <div id="mainScreen" class="hidden">
-        <div class="container mx-auto p-4">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold">Controle de Pagamento</h1>
-                <div>
-                    <span id="statusConexao" class="text-sm mr-4">Conectando ao Firebase...</span>
-                    <button onclick="sair()" class="bg-red-500 text-white px-4 py-2 rounded">Sair</button>
+        <!-- TELA PRINCIPAL -->
+        <div id="mainScreen" class="hidden">
+            <div class="bg-blue-600 text-white p-4 flex justify-between items-center">
+                <h1 class="text-xl font-bold">Controle de Pagamento</h1>
+                <button onclick="logout()" class="bg-blue-700 px-4 py-2 rounded">Sair</button>
+            </div>
+
+            <!-- FORM ADMIN -->
+            <div id="adminForm" class="hidden max-w-4xl mx-auto p-4">
+                <div class="bg-white p-6 rounded-lg shadow mb-6">
+                    <h2 class="text-lg font-bold mb-4">Adicionar Pagamento</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="nome" placeholder="Nome" class="p-2 border rounded">
+                        <input type="number" id="valor" placeholder="Valor R$" class="p-2 border rounded">
+                        <select id="mes" class="p-2 border rounded">
+                            <option value="">Mês</option>
+                            <option>Janeiro</option><option>Fevereiro</option><option>Março</option>
+                            <option>Abril</option><option>Maio</option><option>Junho</option>
+                            <option>Julho</option><option>Agosto</option><option>Setembro</option>
+                            <option>Outubro</option><option>Novembro</option><option>Dezembro</option>
+                        </select>
+                        <button onclick="adicionar()" 
+                                class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                            Adicionar
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div id="adminArea" class="hidden mb-6">
-                <div class="bg-white p-4 rounded shadow">
-                    <h2 class="font-bold mb-2">Adicionar Pessoa</h2>
-                    <input type="text" id="nomeInput" placeholder="Nome" class="p-2 border rounded mr-2">
-                    <input type="number" id="valorInput" placeholder="Valor" class="p-2 border rounded mr-2">
-                    <button onclick="addPessoa()" class="bg-green-500 text-white px-4 py-2 rounded">Adicionar</button>
+            <!-- LISTA -->
+            <div class="max-w-4xl mx-auto p-4">
+                <div class="bg-white rounded-lg shadow">
+                    <div class="p-4 border-b">
+                        <h2 class="text-lg font-bold">Lista de Pagamentos</h2>
+                    </div>
+                    <div id="lista" class="divide-y"></div>
                 </div>
             </div>
-
-            <div id="listaPessoas" class="grid gap-4"></div>
         </div>
     </div>
 
@@ -48,9 +67,6 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
         import { getDatabase, ref, push, set, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
-        // ========================================
-        // CONFIGURAÇÃO DO FIREBASE
-        // ========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
             authDomain: "controle-pagamento-64984.firebaseapp.com",
@@ -61,90 +77,79 @@
             appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
         };
 
-        let app, db, isAdmin = false;
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        let isAdmin = false;
 
-        // Inicia Firebase só depois que a página carrega
-        window.onload = async () => {
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getDatabase(app);
-                console.log('Firebase conectado');
-            } catch (error) {
-                document.getElementById('statusConexao').innerText = 'Erro no Firebase';
-                console.error(error);
-            }
-        };
-
-        window.fazerLogin = () => {
-            const senha = document.getElementById('senhaInput').value;
+        window.login = function() {
+            const senha = document.getElementById('senha').value;
             if (senha === 'admin2026') {
                 isAdmin = true;
-                iniciarSistema();
+                mostrarTela();
             } else if (senha === 'casa') {
                 isAdmin = false;
-                iniciarSistema();
+                mostrarTela();
             } else {
                 document.getElementById('erroLogin').classList.remove('hidden');
             }
-        };
-
-        function iniciarSistema() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('hidden');
-
-            if (isAdmin) {
-                document.getElementById('adminArea').classList.remove('hidden');
-            }
-
-            // Só carrega os dados DEPOIS do login
-            const pessoasRef = ref(db, 'pessoas');
-            onValue(pessoasRef, (snapshot) => {
-                document.getElementById('statusConexao').innerText = 'Conectado ✓';
-                document.getElementById('statusConexao').className = 'text-sm mr-4 text-green-600';
-
-                const data = snapshot.val();
-                const lista = document.getElementById('listaPessoas');
-                lista.innerHTML = '';
-
-                if (data) {
-                    Object.keys(data).forEach(key => {
-                        const pessoa = data[key];
-                        lista.innerHTML += `
-                            <div class="bg-white p-4 rounded shadow flex justify-between">
-                                <div>
-                                    <p class="font-bold">${pessoa.nome}</p>
-                                    <p>R$ ${pessoa.valor}</p>
-                                </div>
-                                ${isAdmin? `<button onclick="delPessoa('${key}')" class="text-red-500">Excluir</button>` : ''}
-                            </div>
-                        `;
-                    });
-                } else {
-                    lista.innerHTML = '<p class="text-gray-500">Nenhuma pessoa cadastrada</p>';
-                }
-            }, (error) => {
-                document.getElementById('statusConexao').innerText = 'Erro: ' + error.message;
-                document.getElementById('statusConexao').className = 'text-sm mr-4 text-red-600';
-            });
         }
 
-        window.addPessoa = () => {
-            const nome = document.getElementById('nomeInput').value;
-            const valor = document.getElementById('valorInput').value;
-            if (nome && valor) {
-                push(ref(db, 'pessoas'), { nome, valor });
-                document.getElementById('nomeInput').value = '';
-                document.getElementById('valorInput').value = '';
-            }
-        };
+        function mostrarTela() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            if (isAdmin) document.getElementById('adminForm').classList.remove('hidden');
+            carregarDados();
+        }
 
-        window.delPessoa = (key) => {
-            remove(ref(db, 'pessoas/' + key));
-        };
-
-        window.sair = () => {
+        window.logout = function() {
             location.reload();
-        };
-    </script>
-</body>
-</html>
+        }
+
+        window.adicionar = function() {
+            const nome = document.getElementById('nome').value;
+            const valor = document.getElementById('valor').value;
+            const mes = document.getElementById('mes').value;
+            
+            if (!nome || !valor || !mes) return alert('Preencha todos os campos');
+            
+            push(ref(db, 'pagamentos'), {
+                nome: nome,
+                valor: parseFloat(valor),
+                mes: mes,
+                pago: false,
+                data: Date.now()
+            });
+            
+            document.getElementById('nome').value = '';
+            document.getElementById('valor').value = '';
+            document.getElementById('mes').value = '';
+        }
+
+        function carregarDados() {
+            onValue(ref(db, 'pagamentos'), (snapshot) => {
+                const lista = document.getElementById('lista');
+                lista.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    lista.innerHTML = '<p class="p-4 text-gray-500">Nenhum pagamento cadastrado</p>';
+                    return;
+                }
+                
+                snapshot.forEach((child) => {
+                    const id = child.key;
+                    const dados = child.val();
+                    
+                    const div = document.createElement('div');
+                    div.className = 'p-4 flex justify-between items-center';
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold">${dados.nome}</p>
+                            <p class="text-sm text-gray-600">${dados.mes} - R$ ${dados.valor.toFixed(2)}</p>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <span class="px-3 py-1 rounded text-sm ${dados.pago ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${dados.pago ? 'Pago' : 'Pendente'}
+                            </span>
+                            ${isAdmin ? `
+                                <button
