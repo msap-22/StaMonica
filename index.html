@@ -6,43 +6,41 @@
     <title>Controle de Pagamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .hidden { display: none; }
+       .hidden { display: none; }
     </style>
 </head>
 <body class="bg-gray-100">
-
-    <!-- TELA DE LOGIN -->
+    <!-- Tela de Login -->
     <div id="loginScreen" class="min-h-screen flex items-center justify-center">
         <div class="bg-white p-8 rounded-lg shadow-md w-96">
             <h1 class="text-2xl font-bold mb-6 text-center">Controle de Pagamento</h1>
-            <input id="senhaInput" type="password" placeholder="Digite a senha" class="w-full p-3 border rounded mb-4">
+            <input type="password" id="senhaInput" placeholder="Digite a senha" class="w-full p-3 border rounded mb-4">
             <button onclick="fazerLogin()" class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600">Entrar</button>
-            <p id="erroLogin" class="text-red-500 text-center mt-4 hidden">Senha incorreta</p>
-            <p id="statusConexao" class="text-gray-500 text-center mt-4">Conectando ao Firebase...</p>
+            <p id="erroLogin" class="text-red-500 text-sm mt-2 hidden">Senha incorreta</p>
         </div>
     </div>
 
-    <!-- TELA PRINCIPAL -->
-    <div id="appScreen" class="hidden p-4 max-w-4xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+    <!-- Tela Principal -->
+    <div id="mainScreen" class="hidden">
+        <div class="container mx-auto p-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold">Controle de Pagamento</h1>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Sair</button>
-            </div>
-
-            <!-- SÓ ADMIN VÊ -->
-            <div id="adminPanel" class="hidden mb-6">
-                <h2 class="text-xl font-semibold mb-4">Adicionar Pessoa</h2>
-                <div class="flex gap-2">
-                    <input id="nomeInput" type="text" placeholder="Nome da pessoa" class="flex-1 p-2 border rounded">
-                    <input id="valorInput" type="number" placeholder="Valor" class="w-32 p-2 border rounded">
-                    <button onclick="adicionarPessoa()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Adicionar</button>
+                <div>
+                    <span id="statusConexao" class="text-sm mr-4">Conectando ao Firebase...</span>
+                    <button onclick="sair()" class="bg-red-500 text-white px-4 py-2 rounded">Sair</button>
                 </div>
             </div>
 
-            <!-- LISTA DE PESSOAS -->
-            <h2 class="text-xl font-semibold mb-4">Lista de Pagamentos</h2>
-            <div id="listaPessoas" class="space-y-2"></div>
+            <div id="adminArea" class="hidden mb-6">
+                <div class="bg-white p-4 rounded shadow">
+                    <h2 class="font-bold mb-2">Adicionar Pessoa</h2>
+                    <input type="text" id="nomeInput" placeholder="Nome" class="p-2 border rounded mr-2">
+                    <input type="number" id="valorInput" placeholder="Valor" class="p-2 border rounded mr-2">
+                    <button onclick="addPessoa()" class="bg-green-500 text-white px-4 py-2 rounded">Adicionar</button>
+                </div>
+            </div>
+
+            <div id="listaPessoas" class="grid gap-4"></div>
         </div>
     </div>
 
@@ -63,99 +61,90 @@
             appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
         };
 
-        // ========================================
-        // VARIÁVEIS GLOBAIS
-        // ========================================
-        let db;
-        let isAdmin = false;
-        const SENHA_ADMIN = 'admin2026';
-        const SENHA_CASA = 'casa';
+        let app, db, isAdmin = false;
 
-        // ========================================
-        // INICIA FIREBASE E DEPOIS LIBERA O LOGIN
-        // ========================================
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-            document.getElementById('statusConexao').innerText = 'Conectado! Digite a senha.';
-            document.getElementById('statusConexao').className = 'text-green-500 text-center mt-4';
-        } catch (error) {
-            document.getElementById('statusConexao').innerText = 'Erro ao conectar: ' + error.message;
-            document.getElementById('statusConexao').className = 'text-red-500 text-center mt-4';
-        }
+        // Inicia Firebase só depois que a página carrega
+        window.onload = async () => {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
+                console.log('Firebase conectado');
+            } catch (error) {
+                document.getElementById('statusConexao').innerText = 'Erro no Firebase';
+                console.error(error);
+            }
+        };
 
-        // ========================================
-        // FUNÇÕES
-        // ========================================
-        window.fazerLogin = function() {
+        window.fazerLogin = () => {
             const senha = document.getElementById('senhaInput').value;
-            
-            if (senha === SENHA_ADMIN) {
+            if (senha === 'admin2026') {
                 isAdmin = true;
-                entrarNoApp();
-            } else if (senha === SENHA_CASA) {
+                iniciarSistema();
+            } else if (senha === 'casa') {
                 isAdmin = false;
-                entrarNoApp();
+                iniciarSistema();
             } else {
                 document.getElementById('erroLogin').classList.remove('hidden');
             }
-        }
+        };
 
-        function entrarNoApp() {
+        function iniciarSistema() {
             document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            
+            document.getElementById('mainScreen').classList.remove('hidden');
+
             if (isAdmin) {
-                document.getElementById('adminPanel').classList.remove('hidden');
-            }
-            
-            carregarPessoas();
-        }
-
-        window.logout = function() {
-            location.reload();
-        }
-
-        window.adicionarPessoa = function() {
-            const nome = document.getElementById('nomeInput').value;
-            const valor = document.getElementById('valorInput').value;
-            
-            if (!nome || !valor) {
-                alert('Preencha nome e valor');
-                return;
+                document.getElementById('adminArea').classList.remove('hidden');
             }
 
-            push(ref(db, 'pessoas'), {
-                nome: nome,
-                valor: parseFloat(valor),
-                pago: false,
-                dataCriacao: Date.now()
-            });
+            // Só carrega os dados DEPOIS do login
+            const pessoasRef = ref(db, 'pessoas');
+            onValue(pessoasRef, (snapshot) => {
+                document.getElementById('statusConexao').innerText = 'Conectado ✓';
+                document.getElementById('statusConexao').className = 'text-sm mr-4 text-green-600';
 
-            document.getElementById('nomeInput').value = '';
-            document.getElementById('valorInput').value = '';
-        }
-
-        function carregarPessoas() {
-            onValue(ref(db, 'pessoas'), (snapshot) => {
+                const data = snapshot.val();
                 const lista = document.getElementById('listaPessoas');
                 lista.innerHTML = '';
-                
-                if (!snapshot.exists()) {
-                    lista.innerHTML = '<p class="text-gray-500">Nenhuma pessoa cadastrada</p>';
-                    return;
-                }
 
-                snapshot.forEach((child) => {
-                    const id = child.key;
-                    const pessoa = child.val();
-                    
-                    const div = document.createElement('div');
-                    div.className = 'flex justify-between items-center p-3 border rounded ' + (pessoa.pago ? 'bg-green-50' : 'bg-white');
-                    
-                    div.innerHTML = `
-                        <div>
-                            <span class="font-semibold">${pessoa.nome}</span>
-                            <span class="ml-4">R$ ${pessoa.valor.toFixed(2)}</span>
-                            ${pessoa.pago ? '<span class="ml-2 text-green-600 text-sm">✓ Pago</span>' : ''}
-                        </div
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        const pessoa = data[key];
+                        lista.innerHTML += `
+                            <div class="bg-white p-4 rounded shadow flex justify-between">
+                                <div>
+                                    <p class="font-bold">${pessoa.nome}</p>
+                                    <p>R$ ${pessoa.valor}</p>
+                                </div>
+                                ${isAdmin? `<button onclick="delPessoa('${key}')" class="text-red-500">Excluir</button>` : ''}
+                            </div>
+                        `;
+                    });
+                } else {
+                    lista.innerHTML = '<p class="text-gray-500">Nenhuma pessoa cadastrada</p>';
+                }
+            }, (error) => {
+                document.getElementById('statusConexao').innerText = 'Erro: ' + error.message;
+                document.getElementById('statusConexao').className = 'text-sm mr-4 text-red-600';
+            });
+        }
+
+        window.addPessoa = () => {
+            const nome = document.getElementById('nomeInput').value;
+            const valor = document.getElementById('valorInput').value;
+            if (nome && valor) {
+                push(ref(db, 'pessoas'), { nome, valor });
+                document.getElementById('nomeInput').value = '';
+                document.getElementById('valorInput').value = '';
+            }
+        };
+
+        window.delPessoa = (key) => {
+            remove(ref(db, 'pessoas/' + key));
+        };
+
+        window.sair = () => {
+            location.reload();
+        };
+    </script>
+</body>
+</html>
