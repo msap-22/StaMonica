@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa - Controle de Mensalidades</title>
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="#" id="manifest">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  * {
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .gradient-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+  
+  .card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+  }
+  
+  .btn-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: translateY(-1px);
+  }
+  
+  .table-row {
+    transition: background 0.2s ease;
+  }
+  
+  .table-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  .status-badge {
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  
+  .modal-animate {
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .toast-animate {
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(100px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  
+  input[type="checkbox"] {
+    accent-color: #3b82f6;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+</style>
+</head>
+<body class="gradient-bg min-h-screen text-slate-100">
+  
+  <!-- Login Screen -->
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-8 w-full max-w-md card-hover modal-animate">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <i data-lucide="home" class="w-8 h-8 text-white"></i>
+        </div>
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Casa</h1>
+        <p class="text-slate-400 mt-2">Controle de Mensalidades</p>
+      </div>
+      
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2">Senha de Acesso</label>
+          <input 
+            type="password" 
+            id="passwordInput" 
+            class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+            placeholder="Digite sua senha"
+            required
+          >
+        </div>
+        <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">
+          Entrar
+        </button>
+      </form>
+      
+      <div id="loginError" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+        <p class="text-red-400 text-sm text-center">Senha incorreta. Tente novamente.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="hidden min-h-screen">
+    <!-- Header -->
+    <header class="glass border-b border-slate-700/50 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+              <i data-lucide="home" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-white">Casa</h1>
+              <p class="text-xs text-slate-400" id="userRole">Visualizador</p>
+            </div>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button id="installBtn" class="hidden px-4 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Instalar App</span>
+            </button>
+            <button id="addBtn" class="hidden btn-primary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Novo</span>
+            </button>
+            <button id="exportBtn" class="hidden px-4 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Exportar</span>
+            </button>
+            <button id="logoutBtn" class="btn-danger text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Sair</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Stats -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="glass rounded-xl p-6 card-hover">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm font-medium">Total Geral</p>
+              <p class="text-2xl font-bold text-white mt-1" id="totalGeral">R$ 0,00</p>
+            </div>
+            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+              <i data-lucide="wallet" class="w-6 h-6 text-blue-400"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="glass rounded-xl p-6 card-hover">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm font-medium">Pagos</p>
+              <p class="text-2xl font-bold text-green-400 mt-1" id="totalPagos">R$ 0,00</p>
+            </div>
+            <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+              <i data-lucide="circle-check" class="w-6 h-6 text-green-400"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="glass rounded-xl p-6 card-hover">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm font-medium">Pendentes</p>
+              <p class="text-2xl font-bold text-yellow-400 mt-1" id="totalPendentes">R$ 0,00</p>
+            </div>
+            <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center">
+              <i data-lucide="clock" class="w-6 h-6 text-yellow-400"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="glass rounded-xl p-6 card-hover">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-slate-400 text-sm font-medium">Registros</p>
+              <p class="text-2xl font-bold text-white mt-1" id="totalRegistros">0</p>
+            </div>
+            <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+              <i data-lucide="file-text" class="w-6 h-6 text-purple-400"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="glass rounded-xl p-6 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Buscar</label>
+            <div class="relative">
+              <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input 
+                type="text" 
+                id="searchInput"
+                class="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                placeholder="Nome, descrição..."
+              >
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
+            <select 
+              id="filterMes"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Todos</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
+            <input 
+              type="number" 
+              id="filterAno"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Ex: 2024"
+            >
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
+            <select 
+              id="filterStatus"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="">Todos</option>
+              <option value="pago">Pago</option>
+              <option value="pendente">Pendente</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-800/50 border-b border-slate-700/50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Descrição</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Valor</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Mês/Ano</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Vencimento</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-center text-xs font-semibold text-slate-300 uppercase tracking-wider" id="actionsHeader">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-700/30">
+            </tbody>
+          </table>
+        </div>
+        
+        <div id="emptyState" class="hidden p-12 text-center">
+          <div class="w-16 h-16 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <i data-lucide="inbox" class="w-8 h-8 text-slate-500"></i>
+          </div>
+          <p class="text-slate-400 font-medium">Nenhum registro encontrado</p>
+          <p class="text-slate-500 text-sm mt-1">Adicione uma nova mensalidade para começar</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Add/Edit -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="glass rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-animate">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-white" id="modalTitle">Nova Mensalidade</h2>
+        <button id="closeModal" class="w-8 h-8 rounded-lg bg-slate-700/50 hover:bg-slate-700 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <form id="mensalidadeForm" class="space-y-4">
+        <input type="hidden" id="editId">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Nome *</label>
+            <input 
+              type="text" 
+              id="inputNome"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Ex: João Silva"
+              required
+            >
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Valor *</label>
+            <input 
+              type="number" 
+              id="inputValor"
+              step="0.01"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="0,00"
+              required
+            >
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Mês *</label>
+            <select 
+              id="inputMes"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+              <option value="">Selecione</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Ano *</label>
+            <input 
+              type="number" 
+              id="inputAno"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="2024"
+              required
+            >
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Vencimento *</label>
+            <input 
+              type="date" 
+              id="inputVencimento"
+              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            >
+          </div>
+          
+          <div class="flex items-center pt-8">
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input 
+                type="checkbox" 
+                id="inputPago"
+                class="w-5 h-5 rounded border-slate-700 cursor-pointer"
+              >
+              <span class="text-sm font-medium text-slate-300">Marcar como Pago</span>
+            </label>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2">Descrição</label>
+          <textarea 
+            id="inputDescricao"
+            rows="3"
+            class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            placeholder="Observações sobre o pagamento..."
+          ></textarea>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="button" id="cancelBtn" class="flex-1 px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg font-medium transition">
+            Cancelar
+          </button>
+          <button type="submit" class="flex-1 btn-primary text-white px-4 py-3 rounded-lg font-medium">
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 glass rounded-xl px-6 py-4 shadow-2xl toast-animate max-w-sm">
+    <div class="flex items-center gap-3">
+      <div id="toastIcon" class="w-8 h-8 rounded-lg flex items-center justify-center"></div>
+      <div>
+        <p class="font-semibold text-white" id="toastTitle"></p>
+        <p class="text-sm text-slate-300" id="toastMessage"></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // State
+  let currentUser = null;
+  let isAdmin = false;
+  let mensalidades = [];
+  let deferredPrompt = null;
+  
+  // Utils
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  };
+  
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr + 'T00:00:00');
+    return date.toLocaleDateString('pt-BR');
+  };
+  
+  const getMesNome = (mes) => {
+    const meses = {
+      '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr',
+      '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago',
+      '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
+    };
+    return meses[mes] || mes;
+  };
+  
+  const showToast = (title, message, type = 'success') => {
+    const toast = document.getElementById('toast');
+    const icon = document.getElementById('toastIcon');
+    const titleEl = document.getElementById('toastTitle');
+    const messageEl = document.getElementById('toastMessage');
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    if (type === 'success') {
+      icon.className = 'w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center';
+      icon.innerHTML = '<i data-lucide="check" class="w-5 h-5 text-green-400"></i>';
+    } else {
+      icon.className = 'w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center';
+      icon.innerHTML = '<i data-lucide="x" class="w-5 h-5 text-red-400"></i>';
+    }
+    
+    lucide.createIcons();
+    toast.classList.remove('hidden');
+    
+    setTimeout(() => {
+      toast.classList.add('hidden');
+    }, 3000);
+  };
+  
+  // Data Management
+  const saveData = () => {
+    localStorage.setItem('casa_mensalidades', JSON.stringify(mensalidades));
+  };
+  
+  const loadData = () => {
+    const data = localStorage.getItem('casa_mensalidades');
+    if (data) {
+      mensalidades = JSON.parse(data);
+    } else {
+      // Demo data
+      mensalidades = [
+        {
+          id: 1,
+          nome: 'Maria Silva',
+          descricao: 'Apartamento 101',
+          valor: 1500.00,
+          mes: '01',
+          ano: 2024,
+          vencimento: '2024-01-10',
+          pago: true
+        },
+        {
+          id: 2,
+          nome: 'João Santos',
+          descricao: 'Apartamento 202',
+          valor: 1800.00,
+          mes: '01',
+          ano: 2024,
+          vencimento: '2024-01-15',
+          pago: false
+        }
+      ];
+      saveData();
+    }
+  };
+  
+  // Auth
+  const checkAuth = () => {
+    const stored = sessionStorage.getItem('casa_auth');
+    if (stored) {
+      const auth = JSON.parse(stored);
+      currentUser = auth.user;
+      isAdmin = auth.role === 'admin';
+      showMainApp();
+    }
+  };
+  
+  const login = (password) => {
+    if (password === 'admin2026') {
+      currentUser = 'admin';
+      isAdmin = true;
+      sessionStorage.setItem('casa_auth', JSON.stringify({ user: 'admin', role: 'admin' }));
+      showMainApp();
+      return true;
+    } else if (password === 'casa') {
+      currentUser = 'viewer';
+      isAdmin = false;
+      sessionStorage.setItem('casa_auth', JSON.stringify({ user: 'viewer', role: 'viewer' }));
+      showMainApp();
+      return true;
+    }
+    return false;
+  };
+  
+  const logout = () => {
+    sessionStorage.removeItem('casa_auth');
+    currentUser = null;
+    isAdmin = false;
+    document.getElementById('mainApp').classList.add('hidden');
+    document.getElementById('loginScreen').classList.remove('hidden');
+    document.getElementById('passwordInput').value = '';
+  };
+  
+  const showMainApp = () => {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    
+    document.getElementById('userRole').textContent = isAdmin ? 'Administrador' : 'Visualizador';
+    
+    if (isAdmin) {
+      document.getElementById('addBtn').classList.remove('hidden');
+      document.getElementById('exportBtn').classList.remove('hidden');
+    } else {
+      document.getElementById('actionsHeader').classList.add('hidden');
+    }
+    
+    loadData();
+    renderTable();
+    updateStats();
+  };
+  
+  // Table Rendering
+  const getFilteredData = () => {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const mes = document.getElementById('filterMes').value;
+    const ano = document.getElementById('filterAno').value;
+    const status = document.getElementById('filterStatus').value;
+    
+    return mensalidades.filter(m => {
+      const matchSearch = m.nome.toLowerCase().includes(search) || 
+                         (m.descricao && m.descricao.toLowerCase().includes(search));
+      const matchMes = !mes || m.mes === mes;
+      const matchAno = !ano || m.ano.toString() === ano;
+      const matchStatus = !status || 
+                         (status === 'pago' && m.pago) || 
+                         (status === 'pendente' && !m.pago);
+      
+      return matchSearch && matchMes && matchAno && matchStatus;
+    });
+  };
+  
+  const renderTable = () => {
+    const tbody = document.getElementById('tableBody');
+    const data = getFilteredData();
+    
+    if (data.length === 0) {
+      tbody.innerHTML = '';
+      document.getElementById('emptyState').classList.remove('hidden');
+      return;
+    }
+    
+    document.getElementById('emptyState').classList.add('hidden');
+    
+    tbody.innerHTML = data.map(m => `
+      <tr class="table-row">
+        <td class="px-6 py-4">
+          <div class="font-medium text-white">${m.nome}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="text-sm text-slate-300">${m.descricao || '-'}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="font-semibold text-white">${formatCurrency(m.valor)}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="text-sm text-slate-300">${getMesNome(m.mes)}/${m.ano}</div>
+        </td>
+        <td class="px-6 py-4">
+          <div class="text-sm text-slate-300">${formatDate(m.vencimento)}</div>
+        </td>
+        <td class="px-6 py-4">
+          ${m.pago ? 
+            '<span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-green-500/10 text-green-400 text-xs font-medium"><i data-lucide="circle-check" class="w-3.5 h-3.5"></i> Pago</span>' :
+            '<span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-yellow-500/10 text-yellow-400 text-xs font-medium"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Pendente</span>'
+          }
+        </td>
+        ${isAdmin ? `
+        <td class="px-6 py-4">
+          <div class="flex items-center justify-center gap-2">
+            <button onclick="togglePago(${m.id})" class="w-8 h-8 rounded-lg bg-slate-700/50 hover:bg-slate-700 flex items-center justify-center transition" title="${m.pago ? 'Marcar como pendente' : 'Marcar como pago'}">
+              <i data-lucide="${m.pago ? 'circle' : 'circle-check'}" class="w-4 h-4"></i>
+            </button>
+            <button onclick="editMensalidade(${m.id})" class="w-8 h-8 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 flex items-center justify-center transition" title="Editar">
+              <i data-lucide="pencil" class="w-4 h-4 text-blue-400"></i>
+            </button>
+            <button onclick="deleteMensalidade(${m.id})" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition" title="Excluir">
+              <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
+            </button>
+          </div>
+        </td>
+        ` : ''}
+      </tr>
+    `).join('');
+    
+    lucide.createIcons();
+  };
+  
+  const updateStats = () => {
+    const data = getFilteredData();
+    const total = data.reduce((sum, m) => sum + m.valor, 0);
+    const pagos = data.filter(m => m.pago).reduce((sum, m) => sum + m.valor, 0);
+    const pendentes = total - pagos;
+    
+    document.getElementById('totalGeral').textContent = formatCurrency(total);
+    document.getElementById('totalPagos').textContent = formatCurrency(pagos);
+    document.getElementById('totalPendentes').textContent = formatCurrency(pendentes);
+    document.getElementById('totalRegistros').textContent = data.length;
+  };
+  
+  // CRUD Operations
+  const openModal = (id = null) => {
+    const modal = document.getElementById('modal');
+    const form = document.getElementById('mensalidadeForm');
+    const title = document.getElementById('modalTitle');
+    
+    form.reset();
+    document.getElementById('editId').value = '';
+    
+    if (id) {
+      const m = mensalidades.find(x => x.id === id);
+      if (m) {
+        title.textContent = 'Editar Mensalidade';
+        document.getElementById('editId').value = m.id;
+        document.getElementById('inputNome').value = m.nome;
+        document.getElementById('inputDescricao').value = m.descricao || '';
+        document.getElementById('inputValor').value = m.valor;
+        document.getElementById('inputMes').value = m.mes;
+        document.getElementById('inputAno').value = m.ano;
+        document.getElementById('inputVencimento').value = m.vencimento;
+        document.getElementById('inputPago').checked = m.pago;
+      }
+    } else {
+      title.textContent = 'Nova Mensalidade';
+      document.getElementById('inputAno').value = new Date().getFullYear();
+    }
+    
+    modal.classList.remove('hidden');
+  };
+  
+  const closeModal = () => {
+    document.getElementById('modal').classList.add('hidden');
+  };
+  
+  const saveMensalidade = (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('editId').value;
+    const data = {
+      id: id ? parseInt(id) : Date.now(),
+      nome: document.getElementById('inputNome').value,
+      descricao: document.getElementById('inputDescricao').value,
+      valor: parseFloat(document.getElementById('inputValor').value),
+      mes: document.getElementById('inputMes').value,
+      ano: parseInt(document.getElementById('inputAno').value),
+      vencimento: document.getElementById('inputVencimento').value,
+      pago: document.getElementById('inputPago').checked
+    };
+    
+    if (id) {
+      const index = mensalidades.findIndex(m => m.id === parseInt(id));
+      mensalidades[index] = data;
+      showToast('Sucesso', 'Mensalidade atualizada com sucesso!');
+    } else {
+      mensalidades.push(data);
+      showToast('Sucesso', 'Mensalidade cadastrada com sucesso!');
+    }
+    
+    saveData();
+    renderTable();
+    updateStats();
+    closeModal();
+  };
+  
+  window.togglePago = (id) => {
+    const m = mensalidades.find(x => x.id === id);
+    if (m) {
+      m.pago = !m.pago;
+      saveData();
+      renderTable();
+      updateStats();
+      showToast('Sucesso', `Mensalidade marcada como ${m.pago ? 'paga' : 'pendente'}!`);
+    }
+  };
+  
+  window.editMensalidade = (id) => {
+    openModal(id);
+  };
+  
+  window.deleteMensalidade = (id) => {
+    if (confirm('Tem certeza que deseja excluir esta mensalidade?')) {
+      mensalidades = mensalidades.filter(m => m.id !== id);
+      saveData();
+      renderTable();
+      updateStats();
+      showToast('Sucesso', 'Mensalidade excluída com sucesso!');
+    }
+  };
+  
+  // Export
+  const exportCSV = () => {
+    const data = getFilteredData();
+    const headers = ['Nome', 'Descrição', 'Valor', 'Mês', 'Ano', 'Vencimento', 'Status'];
+    const rows = data.map(m => [
+      m.nome,
+      m.descricao || '',
+      m.valor.toFixed(2),
+      getMesNome(m.mes),
+      m.ano,
+      formatDate(m.vencimento),
+      m.pago ? 'Pago' : 'Pendente'
+    ]);
+    
+    let csv = headers.join(',') + '\n';
+    csv += rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `mensalidades_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    showToast('Sucesso', 'Dados exportados com sucesso!');
+  };
+  
+  // PWA
+  const setupPWA = () => {
+    // Manifest
+    const manifest = {
+      name: 'Casa - Controle de Mensalidades',
+      short_name: 'Casa',
+      description: 'Sistema de controle de mensalidades',
+      start_url: '.',
+      display: 'standalone',
+      background_color: '#0f172a',
+      theme_color: '#0f172a',
+      icons: [
+        {
+          src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%233b82f6"/%3E%3Cpath d="M256 120 L140 220 L140 380 L220 380 L220 280 L292 280 L292 380 L372 220 Z" fill="white"/%3E%3C/svg%3E',
+          sizes: '512x512',
+          type: 'image/svg+xml'
+        }
+      ]
+    };
+    
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    document.getElementById('manifest').href = URL.createObjectURL(manifestBlob);
+    
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      const sw = `
+        const CACHE_NAME = 'casa-v1';
+        self.addEventListener('install', e => self.skipWaiting());
+        self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            caches.match(e.request).then(r => r || fetch(e.request))
+          );
+        });
+      `;
+      
+      const swBlob = new Blob([sw], { type: 'text/javascript' });
+      const swUrl = URL.createObjectURL(swBlob);
+      navigator.serviceWorker.register(swUrl);
+    }
+    
+    // Install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBtn').classList.remove('hidden');
+    });
+    
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        document.getElementById('installBtn').classList.add('hidden');
+      }
+    });
+  };
+  
+  // Event Listeners
+  document.getElementById('loginForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const password = document.getElementById('passwordInput').value;
+    if (!login(password)) {
+      document.getElementById('loginError').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('loginError').classList.add('hidden');
+      }, 3000);
+    }
+  });
+  
+  document.getElementById('logoutBtn').addEventListener('click', logout);
+  document.getElementById('addBtn').addEventListener('click', () => openModal());
+  document.getElementById('closeModal').addEventListener('click', closeModal);
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('mensalidadeForm').addEventListener('submit', saveMensalidade);
+  document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  
+  // Filters
+  ['searchInput', 'filterMes', 'filterAno', 'filterStatus'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+      renderTable();
+      updateStats();
+    });
+  });
+  
+  // Init
+  lucide.createIcons();
+  setupPWA();
+  checkAuth();
+</script>
+
+</body>
+</html>
