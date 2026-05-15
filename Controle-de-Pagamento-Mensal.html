@@ -1,5 +1,3 @@
-
-
 ```html
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -240,7 +238,7 @@
     } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
+     apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
 
   authDomain: "controle-pagamento-64984.firebaseapp.com",
 
@@ -307,7 +305,7 @@
 
     // ADICIONAR
 
-    window.adicionar = function () {
+    window.adicionar = async function () {
 
       const nome = document.getElementById('nome').value.trim();
       const mes = document.getElementById('mes').value;
@@ -324,21 +322,36 @@
         return;
       }
 
-      push(ref(db, 'pagamentos'), {
-        nome,
-        valor: VALOR_FIXO,
-        mes,
-        pago: status,
-        data: Date.now()
-      });
+      try {
 
-      document.getElementById('nome').value = '';
-      document.getElementById('mes').value = '';
+        await push(ref(db, 'pagamentos'), {
+          nome,
+          valor: VALOR_FIXO,
+          mes,
+          pago: status,
+          data: Date.now()
+        });
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Pagamento adicionado!'
-      });
+        document.getElementById('nome').value = '';
+        document.getElementById('mes').value = '';
+
+        carregarDados();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Pagamento adicionado!'
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao salvar',
+          text: 'Verifique a conexão com o Firebase.'
+        });
+      }
     };
 
     // CARREGAR DADOS
@@ -554,4 +567,5 @@
 </body>
 </html>
 ```
+
 
