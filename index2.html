@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Mensalidades - PWA</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Controle de pagamentos mensais com sincronização em tempo real">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ29udHJvbGUgZGUgTWVuc2FsaWRhZGVzIiwic2hvcnRfbmFtZSI6Ik1lbnNhbGlkYWRlcyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwidGhlbWVfY29sb3IiOiIjMGYxNzJhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhacFpYZENiM2c5SWpBZ01DQXhNRElnZVQwaU1UQTRLWEIwWVhSbElIWmxjbk5wYjI0aVBqeHljbVYwZEhWeVpTVTFOQ1UyTWpnM016a2lJR2xrUFRJME56UTBNQ1ZHVGc5aklpQlBVaFF2SWlCM1gzSmhkR2x2Ym5NaUlGTnZiQWRMWmtabk1GOXViRzhpSUdacGJHdzlJaU13WkdWdk1HVnRZWEJ5SUdOdlpHVTlJbUp5WldRbE1Tb3RNU0F1Sm1ZMGVrdHdiMUkwTVYwNmVrb3RNQWt3YkZBNk1TazBNalV6U1NsdFdHeEhNWEJ1WjFKa2RWRjZNWEJ1WjB3Z2RHaGxleGhOZlVSUVJSSWdlaUJHYVdROUlrWjVZbUpDZHpJOUlqQXdNUlZBWFNQbHQ3WW1Ka2MyUjRhMkZOVkZRNWJWSkljMDVDSW1SNGVHMTFiRlE0ZG1Gc2JDdGtjb0ZOV1VWSmQxaE9lV0ZBZDBQUFFqQjROVnBIYmtwWmEyVktTMzVDYjFGblVWSnRPVTVyZVVOU1ZFUkRSVEV4VWpGd1VxZE1aMEZ2ZFRsNFQwbEVWakEwUnpGS1YwNXFXVkY0VlVNOVh6ZDRVV1F4UlVsNlZXeEZSRlpsUmpCdmJFWm5RWGsxU0ROTlZqQlBhMlpxU2xwM1oyTnJNRXROVVRFNVFsaEpWVEJHVTFJd2FsZFJhbXhUV0dKclNYcFBhMmxEVVdGTlp6MDkifSx7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhacFpYZENiM2c5SWpBZ01DQXhNRElnZVQwaU1UQTRLWEIwWVhSbElIWmxjbk5wYjI0aVBqeHljbVYwZEhWeVpTVTFOQ1UyTWpnM016a2lJR2xrUFRJME56UTBNQ1ZHVGc5aklpQlBVaFF2SWlCM1gzSmhkR2x2Ym5NaUlGTnZiQWRMWmtabk1GOXViRzhpSUdacGJHdzlJaU13WkdWdk1HVnRZWEJ5SUdOdlpHVTlJbUp5WldRbE1Tb3RNU0F1Sm1ZMGVrdHdiMUkwTVYwNmVrb3RNQWt3YkZBNk1TazBNalV6U1NsdFdHeEhNWEJ1WjFKa2RWRjZNWEJ1WjB3Z2RHaGxleGhOZlVSUVJSSWdlaUJHYVdROUlrWjVZbUpDZHpJOUlqQXdNUlZBWFNQbHQ3WW1Ka2MyUjRhMkZOVkZRNWJWSkljMDVDSW1SNGVHMTFiRlE0ZG1Gc2JDdGtjb0ZOV1VWSmQxaE9lV0ZBZDBQUFFqQjROVnBIYmtwWmEyVktTMzVDYjFGblVWSnRPVTVyZVVOU1ZFUkRSVEV4VWpGd1VxZE1aMEZ2ZFRsNFQwbEVWakEwUnpGS1YwNXFXVkY0VlVNOVh6ZDRVV1F4UlVsNlZXeEZSRlpsUmpCdmJFWm5RWGsxU0ROTlZqQlBhMlpxU2xwM1oyTnJNRXROVVRFNVFsaEpWVEJHVTFJd2FsZFJhbXhUV0dKclNYcFBhMmxEVVdGTlp6MDkifV19" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+        }
+        
+        .status-paid {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .status-overdue {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- 
+    ========================================
+    INSTRUÇÕES DE CONFIGURAÇÃO DO FIREBASE
+    ========================================
+    1. Acesse https://console.firebase.google.com/
+    2. Crie um novo projeto ou selecione existente
+    3. Vá em "Configurações do projeto" > "Suas apps" > "Web" 
+    4. Copie o objeto firebaseConfig e cole abaixo substituindo FIREBASE_CONFIG
+    5. No Firebase Console, ative "Realtime Database" em "Build"
+    6. Configure as regras do database para 'true' em leitura/escrita para teste:
+       {
+         "rules": {
+           ".read": true,
+           ".write": true
+         }
+       }
+       ATENÇÃO: Use regras seguras em produção!
+    -->
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center gradient-bg">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-300">Conectando ao Firebase...</p>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="glass-effect rounded-2xl p-8 w-full max-w-md shadow-2xl fade-in">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 mb-4">
+                    <i class="fas fa-wallet text-3xl text-blue-400"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Controle de Mensalidades</h1>
+                <p class="text-gray-400">Digite a senha para acessar</p>
+            </div>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Senha de Acesso</label>
+                    <input 
+                        type="password" 
+                        id="passwordInput"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-white"
+                        placeholder="Digite a senha"
+                        required
+                    >
+                </div>
+                
+                <button 
+                    type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg shadow-blue-500/30"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                </button>
+                
+                <div id="loginError" class="hidden text-red-400 text-sm text-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>Senha incorreta
+                </div>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-slate-700">
+                <p class="text-xs text-gray-500 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Senha 'casa' para visualização | Admin para edição completa
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appScreen" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="glass-effect sticky top-0 z-40 border-b border-slate-700/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold">Controle de Mensalidades</h1>
+                            <div class="flex items-center gap-2 text-xs text-gray-400">
+                                <span id="userRole" class="px-2 py-0.5 rounded bg-slate-700"></span>
+                                <span class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+                                    Sincronizado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        id="logoutBtn"
+                        class="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 font-medium transition flex items-center gap-2"
+                    >
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Total Arrecadado</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPaid">R$ 0,00</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Pendente</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPending">R$ 0,00</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Total de Pessoas</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPeople">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-users text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Taxa de Pagamento</p>
+                            <p class="text-2xl font-bold mt-1" id="paymentRate">0%</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="glass-effect rounded-xl p-4 mb-6">
+                <div class="flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        <select id="monthFilter" class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500">
+                            <option value="all">Todos os meses</option>
+                        </select>
+                        
+                        <select id="statusFilter" class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500">
+                            <option value="all">Todos os status</option>
+                            <option value="paid">Pago</option>
+                            <option value="pending">Pendente</option>
+                            <option value="overdue">Atrasado</option>
+                        </select>
+                        
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Buscar pessoa..."
+                            class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500 w-full sm:w-auto"
+                        >
+                    </div>
+                    
+                    <button 
+                        id="addPersonBtn"
+                        class="hidden px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2"
+                    >
+                        <i class="fas fa-plus"></i>
+                        <span class="hidden sm:inline">Adicionar Pessoa</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="glass-effect rounded-xl overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full">
+                        <thead class="bg-slate-800/50 border-b border-slate-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Nome</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Valor</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Mês</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Status</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Vencimento</th>
+                                <th id="actionsHeader" class="hidden px-4 py-3 text-left text-sm font-semibold text-gray-300">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody" class="divide-y divide-slate-700/50">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyState" class="hidden text-center py-12">
+                    <i class="fas fa-inbox text-4xl text-gray-600 mb-3"></i>
+                    <p class="text-gray-400">Nenhum registro encontrado</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Person Modal -->
+    <div id="addPersonModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="glass-effect rounded-2xl p-6 w-full max-w-md fade-in">
+            <h2 class="text-2xl font-bold mb-4">Adicionar Pessoa</h2>
+            <form id="addPersonForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
+                    <input 
+                        type="text" 
+                        id="personName"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        placeholder="Nome completo"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Valor Mensal</label>
+                    <input 
+                        type="number" 
+                        id="monthlyValue"
+                        step="0.01"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        placeholder="0,00"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Mês de Referência</label>
+                    <input 
+                        type="month" 
+                        id="referenceMonth"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Data de Vencimento</label>
+                    <input 
+                        type="date" 
+                        id="dueDate"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        required
+                    >
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button 
+                        type="button"
+                        id="cancelAddBtn"
+                        class="flex-1 px-4 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium transition"
+                    >
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getDatabase, ref, push, set, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+
+        // ========================================
+        // CONFIGURAÇÃO DO FIREBASE - SUBSTITUA AQUI
+        // ========================================
+        // Cole seu firebaseConfig aqui:
+       const firebaseConfig = {
+
+  apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
+
+  authDomain: "controle-pagamento-64984.firebaseapp.com",
+
+  databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
+
+  projectId: "controle-pagamento-64984",
+
+  storageBucket: "controle-pagamento-64984.firebasestorage.app",
+
+  messagingSenderId: "956557386879",
+
+  appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
+
+};
+
+
+        
+        // Senha de admin - ALTERE PARA SUA SENHA SEGURA
+        const ADMIN_PASSWORD = "sergio22"; // TROQUE ESTA SENHA EM PRODUÇÃO!
+        const READONLY_PASSWORD = "casa";
+        // ========================================
+
+        let app, db;
+        let isAdmin = false;
+        let payments = {};
+        let currentFilters = {
+            month: 'all',
+            status: 'all',
+            search: ''
+        };
+
+        // Initialize Firebase
+        function initFirebase() {
+            try {
+                if (FIREBASE_CONFIG.apiKey === "PASTE_YOUR_API_KEY") {
+                    throw new Error("Firebase não configurado");
+                }
+                app = initializeApp(FIREBASE_CONFIG);
+                db = getDatabase(app);
+                setupRealtimeListener();
+                showLogin();
+            } catch (error) {
+                document.getElementById('loadingScreen').innerHTML = `
+                    <div class="text-center max-w-md px-4">
+                        <i class="fas fa-exclamation-triangle text-4xl text-yellow-400 mb-4"></i>
+                        <h2 class="text-xl font-bold mb-2">Firebase não configurado</h2>
+                        <p class="text-gray-400 text-sm mb-4">Edite o código HTML e cole suas credenciais do Firebase na variável FIREBASE_CONFIG</p>
+                        <div class="glass-effect rounded-lg p-4 text-left text-xs">
+                            <p class="text-gray-300 mb-2">Localize no código:</p>
+                            <pre class="text-green-400 overflow-x-auto">const FIREBASE_CONFIG = { ... }</pre>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Auth
+        function handleLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                localStorage.setItem('userRole', 'admin');
+                showApp();
+            } else if (password === READONLY_PASSWORD) {
+                isAdmin = false;
+                localStorage.setItem('userRole', 'viewer');
+                showApp();
+            } else {
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => errorDiv.classList.add('hidden'), 3000);
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('userRole');
+            isAdmin = false;
+            showLogin();
+        }
+
+        function checkAuth() {
+            const role = localStorage.getItem('userRole');
+            if (role) {
+                isAdmin = role === 'admin';
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // UI State Management
+        function showLoading() {
+            document.getElementById('loadingScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showApp() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            
+            document.getElementById('userRole').textContent = isAdmin ? 'Admin' : 'Visualizador';
+            
+            if (isAdmin) {
+                document.getElementById('addPersonBtn').classList.remove('hidden');
+                document.getElementById('actionsHeader').classList.remove('hidden');
+            }
+            
+            renderPayments();
+        }
+
+        // Firebase Operations
+        function setupRealtimeListener() {
+            const paymentsRef = ref(db, 'payments');
+            onValue(paymentsRef, (snapshot) => {
+                payments = snapshot.val() || {};
+                renderPayments();
+                updateStats();
+                populateMonthFilter();
+            });
+        }
+
+        async function addPayment(paymentData) {
+            const paymentsRef = ref(db, 'payments');
+            await push(paymentsRef, {
+                ...paymentData,
+                status: 'pending',
+                createdAt: Date.now()
+            });
+        }
+
+        async function updatePaymentStatus(id, status) {
+            const paymentRef = ref(db, `payments/${id}`);
+            await update(paymentRef, { status });
+        }
+
+        async function deletePayment(id) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                const paymentRef = ref(db, `payments/${id}`);
+                await remove(paymentRef);
+            }
+        }
+
+        // Rendering
+        function renderPayments() {
+            const tbody = document.getElementById('paymentsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const filtered = filterPayments();
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map(([id, payment]) => {
+                const statusClass = {
+                    paid: 'status-paid',
+                    pending: 'status-pending',
+                    overdue: 'status-overdue'
+                }[payment.status] || 'status-pending';
+                
+                const statusIcon = {
+                    paid: 'fa-check-circle',
+                    pending: 'fa-clock',
+                    overdue: 'fa-exclamation-circle'
+                }[payment.status] || 'fa-clock';
+                
+                const dueDate = new Date(payment.dueDate);
+                const isOverdue = payment.status === 'pending' && dueDate < new Date();
+                const finalStatus = isOverdue ? 'overdue' : payment.status;
+                
+                return `
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="px-4 py-3">
+                            <div class="font-medium">${payment.name}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-semibold">R$ ${payment.value.toFixed(2).replace('.', ',')}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${formatMonth(payment.month)}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                <i class="fas ${statusIcon}"></i>
+                                ${getStatusLabel(finalStatus)}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${formatDate(payment.dueDate)}</div>
+                        </td>
+                        ${isAdmin ? `
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                ${payment.status !== 'paid' ? `
+                                <button 
+                                    onclick="window.markAsPaid('${id}')"
+                                    class="px-3 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 text-sm transition"
+                                    title="Marcar como pago"
+                                >
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                ` : ''}
+                                <button 
+                                    onclick="window.deletePaymentRecord('${id}')"
+                                    class="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm transition"
+                                    title="Excluir"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        ` : ''}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterPayments() {
+            return Object.entries(payments).filter(([id, payment]) => {
+                const monthMatch = currentFilters.month === 'all' || payment.month === currentFilters.month;
+                const searchMatch = payment.name.toLowerCase().includes(currentFilters.search.toLowerCase());
+                
+                let statusMatch = true;
+                if (currentFilters.status !== 'all') {
+                    const dueDate = new Date(payment.dueDate);
+                    const isOverdue = payment.status === 'pending' && dueDate < new Date();
+                    const finalStatus = isOverdue ? 'overdue' : payment.status;
+                    statusMatch = finalStatus === currentFilters.status;
+                }
+                
+                return monthMatch && searchMatch && statusMatch;
+            }).sort((a, b) => b[1].createdAt - a[1].createdAt);
+        }
+
+        function updateStats() {
+            const allPayments = Object.values(payments);
+            let totalPaid = 0;
+            let totalPending = 0;
+            let paidCount = 0;
+            
+            allPayments.forEach(payment => {
+                if (payment.status === 'paid') {
+                    totalPaid += payment.value;
+                    paidCount++;
+                } else {
+                    totalPending += payment.value;
+                }
+            });
+            
+            const totalPeople = new Set(allPayments.map(p => p.name)).size;
+            const paymentRate = allPayments.length > 0 ? (paidCount / allPayments.length * 100).toFixed(0) : 0;
+            
+            document.getElementById('totalPaid').textContent = `R$ ${totalPaid.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalPending').textContent = `R$ ${totalPending.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalPeople').textContent = totalPeople;
+            document.getElementById('paymentRate').textContent = `${paymentRate}%`;
+        }
+
+        function populateMonthFilter() {
+            const months = new Set(Object.values(payments).map(p => p.month));
+            const select = document.getElementById('monthFilter');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="all">Todos os meses</option>' + 
+                Array.from(months).sort().reverse().map(month => 
+                    `<option value="${month}">${formatMonth(month)}</option>`
+                ).join('');
+            
+            select.value = currentValue;
+        }
+
+        // Helpers
+        function formatMonth(monthStr) {
+            const [year, month] = monthStr.split('-');
+            const date = new Date(year, month - 1);
+            return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function getStatusLabel(status) {
+            return {
+                paid: 'Pago',
+                pending: 'Pendente',
+                overdue: 'Atrasado'
+            }[status] || 'Pendente';
+        }
+
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        
+        document.getElementById('addPersonBtn').addEventListener('click', () => {
+            document.getElementById('addPersonModal').classList.remove('hidden');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('referenceMonth').value = today.substring(0, 7);
+            document.getElementById('dueDate').value = today;
+        });
+        
+        document.getElementById('cancelAddBtn').addEventListener('click', () => {
+            document.getElementById('addPersonModal').classList.add('hidden');
+            document.getElementById('addPersonForm').reset();
+        });
+        
+        document.getElementById('addPersonForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('personName').value,
+                value: parseFloat(document.getElementById('monthlyValue').value),
+                month: document.getElementById('referenceMonth').value,
+                dueDate: document.getElementById('dueDate').value
+            };
+            await addPayment(data);
+            document.getElementById('addPersonModal').classList.add('hidden');
+            document.getElementById('addPersonForm').reset();
+        });
+        
+        document.getElementById('monthFilter').addEventListener('change', (e) => {
+            currentFilters.month = e.target.value;
+            renderPayments();
+        });
+        
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            currentFilters.status = e.target.value;
+            renderPayments();
+        });
+        
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentFilters.search = e.target.value;
+            renderPayments();
+        });
+
+        // Global functions for inline onclick
+        window.markAsPaid = async (id) => {
+            await updatePaymentStatus(id, 'paid');
+        };
+        
+        window.deletePaymentRecord = async (id) => {
+            await deletePayment(id);
+        };
+
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            const sw = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blob = new Blob([sw], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        // Init
+        initFirebase();
+    </script>
+</body>
+</html>
