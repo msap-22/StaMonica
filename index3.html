@@ -1,0 +1,605 @@
+# Controle de Pagamentos Profissional
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Pagamentos</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen">
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 fade-in">
+
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">
+          Controle de Pagamentos
+        </h1>
+        <p class="text-slate-500">
+          Sistema financeiro simplificado
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <input
+          type="password"
+          id="senha"
+          placeholder="Digite sua senha"
+          class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+        />
+
+        <button
+          onclick="login()"
+          class="w-full bg-blue-600 hover:bg-blue-700 transition text-white p-4 rounded-xl font-semibold"
+        >
+          Entrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SISTEMA -->
+  <div id="mainScreen" class="hidden">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">
+            Controle de Pagamentos
+          </h1>
+          <p class="text-sm text-slate-500">
+            Painel financeiro
+          </p>
+        </div>
+
+        <button
+          onclick="logout()"
+          class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold transition"
+        >
+          Sair
+        </button>
+
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6">
+
+      <!-- DASHBOARD -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <div class="bg-white rounded-2xl shadow-md p-5">
+          <p class="text-slate-500 text-sm mb-1">Total Recebido</p>
+          <h2 id="totalPago" class="text-3xl font-bold text-green-600">R$ 0,00</h2>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-5">
+          <p class="text-slate-500 text-sm mb-1">Total Pendente</p>
+          <h2 id="totalPendente" class="text-3xl font-bold text-red-600">R$ 0,00</h2>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-5">
+          <p class="text-slate-500 text-sm mb-1">Clientes</p>
+          <h2 id="totalClientes" class="text-3xl font-bold text-blue-600">0</h2>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md p-5">
+          <p class="text-slate-500 text-sm mb-1">Pagamentos</p>
+          <h2 id="totalPagamentos" class="text-3xl font-bold text-slate-700">0</h2>
+        </div>
+
+      </div>
+
+      <!-- FORM -->
+      <div id="adminForm" class="hidden bg-white rounded-2xl shadow-md p-6 mb-6 fade-in">
+
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+          <h2 class="text-2xl font-bold text-slate-800">
+            Novo Pagamento
+          </h2>
+
+          <span class="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
+            Valor fixo: R$ 100,00
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+          <input
+            type="text"
+            id="nome"
+            placeholder="Nome da pessoa"
+            class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+
+          <select
+            id="mes"
+            class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="">Selecione o mês</option>
+            <option>Janeiro</option>
+            <option>Fevereiro</option>
+            <option>Março</option>
+            <option>Abril</option>
+            <option>Maio</option>
+            <option>Junho</option>
+            <option>Julho</option>
+            <option>Agosto</option>
+            <option>Setembro</option>
+            <option>Outubro</option>
+            <option>Novembro</option>
+            <option>Dezembro</option>
+          </select>
+
+          <select
+            id="statusInicial"
+            class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="false">Pendente</option>
+            <option value="true">Pago</option>
+          </select>
+
+          <button
+            onclick="adicionar()"
+            class="bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition p-4"
+          >
+            Adicionar
+          </button>
+
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <input
+            type="text"
+            id="buscar"
+            placeholder="Buscar por nome"
+            class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+          />
+
+          <select
+            id="filtro"
+            class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="todos">Todos</option>
+            <option value="pagos">Pagos</option>
+            <option value="pendentes">Pendentes</option>
+          </select>
+
+          <button
+            onclick="carregarDados()"
+            class="bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold transition p-4"
+          >
+            Atualizar
+          </button>
+
+        </div>
+      </div>
+
+      <!-- LISTA -->
+      <div class="bg-white rounded-2xl shadow-md overflow-x-auto">
+
+        <table class="w-full min-w-[1200px] border-collapse">
+
+          <thead class="bg-slate-100">
+            <tr>
+              <th class="p-4 text-left">Participante</th>
+              <th class="p-4">Abr/26</th>
+              <th class="p-4">Mai/26</th>
+              <th class="p-4">Jun/26</th>
+              <th class="p-4">Jul/26</th>
+              <th class="p-4">Ago/26</th>
+              <th class="p-4">Set/26</th>
+              <th class="p-4">Out/26</th>
+              <th class="p-4">Nov/26</th>
+              <th class="p-4">Dez/26</th>
+              <th class="p-4">Jan/27</th>
+            </tr>
+          </thead>
+
+          <tbody id="lista"></tbody>
+
+        </table>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script type="module">
+
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+
+    import {
+      getDatabase,
+      ref,
+      push,
+      onValue,
+      remove,
+      update
+    } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      databaseURL: "SUA_DATABASE_URL",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_STORAGE_BUCKET",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let isAdmin = false;
+    const VALOR_FIXO = 100;
+
+    const meses = [
+      'Abr/26',
+      'Mai/26',
+      'Jun/26',
+      'Jul/26',
+      'Ago/26',
+      'Set/26',
+      'Out/26',
+      'Nov/26',
+      'Dez/26',
+      'Jan/27'
+    ];
+
+    // LOGIN
+
+    window.login = function () {
+
+      const senha = document.getElementById('senha').value;
+
+      if (senha === 'admin2026') {
+
+        isAdmin = true;
+        mostrarSistema();
+
+      } else if (senha === 'casa') {
+
+        isAdmin = false;
+        mostrarSistema();
+
+      } else {
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Senha incorreta',
+          text: 'Verifique sua senha.'
+        });
+      }
+    };
+
+    function mostrarSistema() {
+
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainScreen').classList.remove('hidden');
+
+      if (isAdmin) {
+        document.getElementById('adminForm').classList.remove('hidden');
+      }
+
+      carregarDados();
+    }
+
+    // LOGOUT
+
+    window.logout = function () {
+      location.reload();
+    };
+
+    // ADICIONAR
+
+    window.adicionar = async function () {
+
+      const nome = document.getElementById('nome').value.trim();
+      const mes = document.getElementById('mes').value;
+      const status = document.getElementById('statusInicial').value === 'true';
+
+      if (!nome || !mes) {
+
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campos obrigatórios',
+          text: 'Preencha nome e mês.'
+        });
+
+        return;
+      }
+
+      try {
+
+        await push(ref(db, 'pagamentos'), {
+          nome,
+          valor: VALOR_FIXO,
+          mes,
+          pago: status,
+          data: Date.now()
+        });
+
+        document.getElementById('nome').value = '';
+        document.getElementById('mes').value = '';
+
+        carregarDados();
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Pagamento adicionado!'
+        });
+
+      } catch (error) {
+
+        console.error(error);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao salvar',
+          text: 'Verifique a conexão com o Firebase.'
+        });
+      }
+    };
+
+    // CARREGAR DADOS
+
+    window.carregarDados = function () {
+
+      onValue(ref(db, 'pagamentos'), (snapshot) => {
+
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '';
+
+        let totalPago = 0;
+        let totalPendente = 0;
+        let totalClientes = 0;
+        let totalPagamentos = 0;
+
+        if (!snapshot.exists()) {
+
+          lista.innerHTML = `
+            <div class="p-10 text-center text-slate-500">
+              Nenhum pagamento encontrado.
+            </div>
+          `;
+
+          return;
+        }
+
+        let pagamentos = [];
+
+        snapshot.forEach((child) => {
+          pagamentos.push({
+            id: child.key,
+            ...child.val()
+          });
+        });
+
+        pagamentos.sort((a, b) => {
+          return a.pago - b.pago;
+        });
+
+        const busca = document.getElementById('buscar').value.toLowerCase();
+        const filtro = document.getElementById('filtro').value;
+
+        pagamentos.forEach((dados) => {
+
+          if (!dados.nome.toLowerCase().includes(busca)) {
+            return;
+          }
+
+          if (filtro === 'pagos' && !dados.pago) {
+            return;
+          }
+
+          if (filtro === 'pendentes' && dados.pago) {
+            return;
+          }
+
+          totalPagamentos++;
+          totalClientes++;
+
+          if (dados.pago) {
+            totalPago += dados.valor;
+          } else {
+            totalPendente += dados.valor;
+          }
+
+          const data = new Date(dados.data).toLocaleDateString('pt-BR');
+
+          const div = document.createElement('div');
+
+          div.className = `
+            p-5 border-b border-slate-100
+            hover:bg-slate-50 transition
+            flex flex-col lg:flex-row
+            justify-between gap-4
+          `;
+
+          let botoes = '';
+
+          if (isAdmin) {
+
+            botoes = `
+              <div class="flex flex-col sm:flex-row gap-2">
+
+                <button
+                  onclick="togglePago('${dados.id}', ${!dados.pago})"
+                  class="px-4 py-3 rounded-xl font-semibold text-white transition
+                  ${dados.pago
+                    ? 'bg-amber-500 hover:bg-amber-600'
+                    : 'bg-blue-500 hover:bg-blue-600'}"
+                >
+                  ${dados.pago ? 'Desmarcar' : 'Marcar Pago'}
+                </button>
+
+                <button
+                  onclick="excluir('${dados.id}')"
+                  class="px-4 py-3 rounded-xl font-semibold bg-red-500 hover:bg-red-600 text-white transition"
+                >
+                  Excluir
+                </button>
+
+              </div>
+            `;
+          }
+
+          div.innerHTML = `
+
+            <div class="flex items-start gap-4">
+
+              <div class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xl">
+                ${dados.nome.charAt(0).toUpperCase()}
+              </div>
+
+              <div>
+                <h3 class="font-bold text-lg text-slate-800">
+                  ${dados.nome}
+                </h3>
+
+                <p class="text-slate-500 text-sm mt-1">
+                  ${dados.mes} • ${data}
+                </p>
+
+                <p class="font-semibold mt-2 text-slate-700">
+                  R$ ${dados.valor.toFixed(2)}
+                </p>
+              </div>
+
+            </div>
+
+            <div class="flex flex-col items-start lg:items-end gap-3">
+
+              <span class="px-4 py-2 rounded-full text-sm font-bold
+                ${dados.pago
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-700'}">
+
+                ${dados.pago ? '✓ Pago' : '⏳ Pendente'}
+
+              </span>
+
+              ${botoes}
+
+            </div>
+          `;
+
+          lista.appendChild(div);
+        });
+
+        document.getElementById('totalPago').innerText = `R$ ${totalPago.toFixed(2)}`;
+        document.getElementById('totalPendente').innerText = `R$ ${totalPendente.toFixed(2)}`;
+        document.getElementById('totalClientes').innerText = totalClientes;
+        document.getElementById('totalPagamentos').innerText = totalPagamentos;
+
+      });
+    };
+
+    // ALTERAR STATUS
+
+    window.toggleMes = function (id, mes, status) {
+
+      update(ref(db, `participantes/${id}/pagamentos`), {
+        [mes]: status
+      });
+    };
+
+    // EXCLUIR
+
+    window.excluir = function (id) {
+
+      Swal.fire({
+        title: 'Deseja excluir?',
+        text: 'Essa ação não poderá ser desfeita.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+
+        if (result.isConfirmed) {
+
+          remove(ref(db, 'pagamentos/' + id));
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Excluído com sucesso'
+          });
+        }
+      });
+    };
+
+    // FILTROS
+
+    document.getElementById('buscar').addEventListener('input', carregarDados);
+    document.getElementById('filtro').addEventListener('change', carregarDados);
+
+    // ENTER LOGIN
+
+    document.getElementById('senha').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
+
+  </script>
+
+</body>
+</html>
+```
+
+# Melhorias adicionadas
+
+* Dashboard profissional
+* Totalizadores
+* Busca por nome
+* Filtros
+* SweetAlert2
+* Layout moderno
+* Melhor responsividade
+* Cards profissionais
+* Avatar com inicial
+* Ordenação automática
+* Melhor UX
+* Enter no login
+* Animações suaves
+* Código mais organizado
+* Interface estilo SaaS
