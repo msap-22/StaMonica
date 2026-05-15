@@ -130,47 +130,48 @@
           </span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
 
           <input
             type="text"
             id="nome"
+            list="listaParticipantes"
             placeholder="Nome da pessoa"
             class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
           />
+
+          <datalist id="listaParticipantes"></datalist>
 
           <select
             id="mes"
             class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
           >
             <option value="">Selecione o mês</option>
-            <option>Janeiro</option>
-            <option>Fevereiro</option>
-            <option>Março</option>
-            <option>Abril</option>
-            <option>Maio</option>
-            <option>Junho</option>
-            <option>Julho</option>
-            <option>Agosto</option>
-            <option>Setembro</option>
-            <option>Outubro</option>
-            <option>Novembro</option>
-            <option>Dezembro</option>
+            <option>Abr/26</option>
+            <option>Mai/26</option>
+            <option>Jun/26</option>
+            <option>Jul/26</option>
+            <option>Ago/26</option>
+            <option>Set/26</option>
+            <option>Out/26</option>
+            <option>Nov/26</option>
+            <option>Dez/26</option>
+            <option>Jan/27</option>
           </select>
 
           <select
             id="statusInicial"
             class="p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
           >
-            <option value="false">Pendente</option>
             <option value="true">Pago</option>
+            <option value="false">Pendente</option>
           </select>
 
           <button
             onclick="adicionar()"
             class="bg-green-500 hover:bg-green-600 text-white rounded-xl font-semibold transition p-4"
           >
-            Adicionar
+            Atualizar
           </button>
 
         </div>
@@ -215,16 +216,46 @@
           <thead class="bg-slate-100">
             <tr>
               <th class="p-4 text-left">Participante</th>
-              <th class="p-4">Abr/26</th>
-              <th class="p-4">Mai/26</th>
-              <th class="p-4">Jun/26</th>
-              <th class="p-4">Jul/26</th>
-              <th class="p-4">Ago/26</th>
-              <th class="p-4">Set/26</th>
-              <th class="p-4">Out/26</th>
-              <th class="p-4">Nov/26</th>
-              <th class="p-4">Dez/26</th>
-              <th class="p-4">Jan/27</th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Abr/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Mai/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Jun/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Jul/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Ago/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Set/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Out/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Nov/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Dez/26</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
+              <th class="p-4 text-center">
+                <div class="font-bold">Jan/27</div>
+                <div class="text-xs text-slate-500 mt-1">Status</div>
+              </th>
             </tr>
           </thead>
 
@@ -251,20 +282,13 @@
     } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
     const firebaseConfig = {
-       apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
-
-  authDomain: "controle-pagamento-64984.firebaseapp.com",
-
-  databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
-
-  projectId: "controle-pagamento-64984",
-
-  storageBucket: "controle-pagamento-64984.firebasestorage.app",
-
-  messagingSenderId: "956557386879",
-
-  appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
-
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      databaseURL: "SUA_DATABASE_URL",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_STORAGE_BUCKET",
+      messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+      appId: "SEU_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -591,3 +615,5 @@
 
 
 
+* Código mais organizado
+* Interface estilo SaaS
