@@ -1,902 +1,776 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Casa - Controle de Mensalidades</title>
-<meta name="theme-color" content="#0f172a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="#" id="manifest">
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
-  * {
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .glass {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .gradient-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  }
-  
-  .card-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    transition: all 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
-  }
-  
-  .btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    transition: all 0.3s ease;
-  }
-  
-  .btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-1px);
-  }
-  
-  .table-row {
-    transition: background 0.2s ease;
-  }
-  
-  .table-row:hover {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  
-  .status-badge {
-    animation: fadeIn 0.3s ease;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  
-  .modal-animate {
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  .toast-animate {
-    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(100px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  
-  input[type="checkbox"] {
-    accent-color: #3b82f6;
-  }
-  
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Mensalidades - PWA</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Controle de pagamentos mensais com sincronização em tempo real">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ29udHJvbGUgZGUgTWVuc2FsaWRhZGVzIiwic2hvcnRfbmFtZSI6Ik1lbnNhbGlkYWRlcyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGYxNzJhIiwidGhlbWVfY29sb3IiOiIjMGYxNzJhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhacFpYZENiM2c5SWpBZ01DQXhNRElnZVQwaU1UQTRLWEIwWVhSbElIWmxjbk5wYjI0aVBqeHljbVYwZEhWeVpTVTFOQ1UyTWpnM016a2lJR2xrUFRJME56UTBNQ1ZHVGc5aklpQlBVaFF2SWlCM1gzSmhkR2x2Ym5NaUlGTnZiQWRMWmtabk1GOXViRzhpSUdacGJHdzlJaU13WkdWdk1HVnRZWEJ5SUdOdlpHVTlJbUp5WldRbE1Tb3RNU0F1Sm1ZMGVrdHdiMUkwTVYwNmVrb3RNQWt3YkZBNk1TazBNalV6U1NsdFdHeEhNWEJ1WjFKa2RWRjZNWEJ1WjB3Z2RHaGxleGhOZlVSUVJSSWdlaUJHYVdROUlrWjVZbUpDZHpJOUlqQXdNUlZBWFNQbHQ3WW1Ka2MyUjRhMkZOVkZRNWJWSkljMDVDSW1SNGVHMTFiRlE0ZG1Gc2JDdGtjb0ZOV1VWSmQxaE9lV0ZBZDBQUFFqQjROVnBIYmtwWmEyVktTMzVDYjFGblVWSnRPVTVyZVVOU1ZFUkRSVEV4VWpGd1VxZE1aMEZ2ZFRsNFQwbEVWakEwUnpGS1YwNXFXVkY0VlVNOVh6ZDRVV1F4UlVsNlZXeEZSRlpsUmpCdmJFWm5RWGsxU0ROTlZqQlBhMlpxU2xwM1oyTnJNRXROVVRFNVFsaEpWVEJHVTFJd2FsZFJhbXhUV0dKclNYcFBhMmxEVVdGTlp6MDkifSx7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhacFpYZENiM2c5SWpBZ01DQXhNRElnZVQwaU1UQTRLWEIwWVhSbElIWmxjbk5wYjI0aVBqeHljbVYwZEhWeVpTVTFOQ1UyTWpnM016a2lJR2xrUFRJME56UTBNQ1ZHVGc5aklpQlBVaFF2SWlCM1gzSmhkR2x2Ym5NaUlGTnZiQWRMWmtabk1GOXViRzhpSUdacGJHdzlJaU13WkdWdk1HVnRZWEJ5SUdOdlpHVTlJbUp5WldRbE1Tb3RNU0F1Sm1ZMGVrdHdiMUkwTVYwNmVrb3RNQWt3YkZBNk1TazBNalV6U1NsdFdHeEhNWEJ1WjFKa2RWRjZNWEJ1WjB3Z2RHaGxleGhOZlVSUVJSSWdlaUJHYVdROUlrWjVZbUpDZHpJOUlqQXdNUlZBWFNQbHQ3WW1Ka2MyUjRhMkZOVkZRNWJWSkljMDVDSW1SNGVHMTFiRlE0ZG1Gc2JDdGtjb0ZOV1VWSmQxaE9lV0ZBZDBQUFFqQjROVnBIYmtwWmEyVktTMzVDYjFGblVWSnRPVTVyZVVOU1ZFUkRSVEV4VWpGd1VxZE1aMEZ2ZFRsNFQwbEVWakEwUnpGS1YwNXFXVkY0VlVNOVh6ZDRVV1F4UlVsNlZXeEZSRlpsUmpCdmJFWm5RWGsxU0ROTlZqQlBhMlpxU2xwM1oyTnJNRXROVVRFNVFsaEpWVEJHVTFJd2FsZFJhbXhUV0dKclNYcFBhMmxEVVdGTlp6MDkifV19" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+        }
+        
+        .status-paid {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        .status-overdue {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="gradient-bg min-h-screen text-slate-100">
-  
-  <!-- Login Screen -->
-  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-2xl p-8 w-full max-w-md card-hover modal-animate">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <i data-lucide="home" class="w-8 h-8 text-white"></i>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- 
+    ========================================
+    INSTRUÇÕES DE CONFIGURAÇÃO DO FIREBASE
+    ========================================
+    1. Acesse https://console.firebase.google.com/
+    2. Crie um novo projeto ou selecione existente
+    3. Vá em "Configurações do projeto" > "Suas apps" > "Web" 
+    4. Copie o objeto firebaseConfig e cole abaixo substituindo FIREBASE_CONFIG
+    5. No Firebase Console, ative "Realtime Database" em "Build"
+    6. Configure as regras do database para 'true' em leitura/escrita para teste:
+       {
+         "rules": {
+           ".read": true,
+           ".write": true
+         }
+       }
+       ATENÇÃO: Use regras seguras em produção!
+    -->
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 z-50 flex items-center justify-center gradient-bg">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-300">Conectando ao Firebase...</p>
         </div>
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">Casa</h1>
-        <p class="text-slate-400 mt-2">Controle de Mensalidades</p>
-      </div>
-      
-      <form id="loginForm" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Senha de Acesso</label>
-          <input 
-            type="password" 
-            id="passwordInput" 
-            class="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-            placeholder="Digite sua senha"
-            required
-          >
-        </div>
-        <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">
-          Entrar
-        </button>
-      </form>
-      
-      <div id="loginError" class="hidden mt-4 p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-        <p class="text-red-400 text-sm text-center">Senha incorreta. Tente novamente.</p>
-      </div>
     </div>
-  </div>
 
-  <!-- Main App -->
-  <div id="mainApp" class="hidden min-h-screen">
-    <!-- Header -->
-    <header class="glass border-b border-slate-700/50 sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div class="flex items-center justify-between flex-wrap gap-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
-              <i data-lucide="home" class="w-5 h-5 text-white"></i>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="hidden min-h-screen flex items-center justify-center p-4">
+        <div class="glass-effect rounded-2xl p-8 w-full max-w-md shadow-2xl fade-in">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/20 mb-4">
+                    <i class="fas fa-wallet text-3xl text-blue-400"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-2">Controle de Mensalidades</h1>
+                <p class="text-gray-400">Digite a senha para acessar</p>
             </div>
-            <div>
-              <h1 class="text-xl font-bold text-white">Casa</h1>
-              <p class="text-xs text-slate-400" id="userRole">Visualizador</p>
+            
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Senha de Acesso</label>
+                    <input 
+                        type="password" 
+                        id="passwordInput"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-white"
+                        placeholder="Digite a senha"
+                        required
+                    >
+                </div>
+                
+                <button 
+                    type="submit"
+                    class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold py-3 rounded-lg transition duration-200 shadow-lg shadow-blue-500/30"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                </button>
+                
+                <div id="loginError" class="hidden text-red-400 text-sm text-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>Senha incorreta
+                </div>
+            </form>
+            
+            <div class="mt-6 pt-6 border-t border-slate-700">
+                <p class="text-xs text-gray-500 text-center">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Senha 'casa' para visualização | Admin para edição completa
+                </p>
             </div>
-          </div>
-          
-          <div class="flex items-center gap-2">
-            <button id="installBtn" class="hidden px-4 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              <span class="hidden sm:inline">Instalar App</span>
-            </button>
-            <button id="addBtn" class="hidden btn-primary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span class="hidden sm:inline">Novo</span>
-            </button>
-            <button id="exportBtn" class="hidden px-4 py-2 bg-slate-700/50 hover:bg-slate-700 rounded-lg text-sm font-medium transition flex items-center gap-2">
-              <i data-lucide="download" class="w-4 h-4"></i>
-              <span class="hidden sm:inline">Exportar</span>
-            </button>
-            <button id="logoutBtn" class="btn-danger text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-              <i data-lucide="log-out" class="w-4 h-4"></i>
-              <span class="hidden sm:inline">Sair</span>
-            </button>
-          </div>
         </div>
-      </div>
-    </header>
-
-    <!-- Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="glass rounded-xl p-6 card-hover">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-400 text-sm font-medium">Total Geral</p>
-              <p class="text-2xl font-bold text-white mt-1" id="totalGeral">R$ 0,00</p>
-            </div>
-            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-              <i data-lucide="wallet" class="w-6 h-6 text-blue-400"></i>
-            </div>
-          </div>
-        </div>
-        
-        <div class="glass rounded-xl p-6 card-hover">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-400 text-sm font-medium">Pagos</p>
-              <p class="text-2xl font-bold text-green-400 mt-1" id="totalPagos">R$ 0,00</p>
-            </div>
-            <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-              <i data-lucide="circle-check" class="w-6 h-6 text-green-400"></i>
-            </div>
-          </div>
-        </div>
-        
-        <div class="glass rounded-xl p-6 card-hover">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-400 text-sm font-medium">Pendentes</p>
-              <p class="text-2xl font-bold text-yellow-400 mt-1" id="totalPendentes">R$ 0,00</p>
-            </div>
-            <div class="w-12 h-12 bg-yellow-500/10 rounded-xl flex items-center justify-center">
-              <i data-lucide="clock" class="w-6 h-6 text-yellow-400"></i>
-            </div>
-          </div>
-        </div>
-        
-        <div class="glass rounded-xl p-6 card-hover">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-slate-400 text-sm font-medium">Registros</p>
-              <p class="text-2xl font-bold text-white mt-1" id="totalRegistros">0</p>
-            </div>
-            <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
-              <i data-lucide="file-text" class="w-6 h-6 text-purple-400"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="glass rounded-xl p-6 mb-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Buscar</label>
-            <div class="relative">
-              <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2"></i>
-              <input 
-                type="text" 
-                id="searchInput"
-                class="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                placeholder="Nome, descrição..."
-              >
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Mês</label>
-            <select 
-              id="filterMes"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            >
-              <option value="">Todos</option>
-              <option value="01">Janeiro</option>
-              <option value="02">Fevereiro</option>
-              <option value="03">Março</option>
-              <option value="04">Abril</option>
-              <option value="05">Maio</option>
-              <option value="06">Junho</option>
-              <option value="07">Julho</option>
-              <option value="08">Agosto</option>
-              <option value="09">Setembro</option>
-              <option value="10">Outubro</option>
-              <option value="11">Novembro</option>
-              <option value="12">Dezembro</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Ano</label>
-            <input 
-              type="number" 
-              id="filterAno"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-              placeholder="Ex: 2024"
-            >
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Status</label>
-            <select 
-              id="filterStatus"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            >
-              <option value="">Todos</option>
-              <option value="pago">Pago</option>
-              <option value="pendente">Pendente</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table -->
-      <div class="glass rounded-xl overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-slate-800/50 border-b border-slate-700/50">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Nome</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Descrição</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Valor</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Mês/Ano</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Vencimento</th>
-                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-300 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-center text-xs font-semibold text-slate-300 uppercase tracking-wider" id="actionsHeader">Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody" class="divide-y divide-slate-700/30">
-            </tbody>
-          </table>
-        </div>
-        
-        <div id="emptyState" class="hidden p-12 text-center">
-          <div class="w-16 h-16 bg-slate-800/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <i data-lucide="inbox" class="w-8 h-8 text-slate-500"></i>
-          </div>
-          <p class="text-slate-400 font-medium">Nenhum registro encontrado</p>
-          <p class="text-slate-500 text-sm mt-1">Adicione uma nova mensalidade para começar</p>
-        </div>
-      </div>
-    </main>
-  </div>
-
-  <!-- Modal Add/Edit -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="glass rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-animate">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-white" id="modalTitle">Nova Mensalidade</h2>
-        <button id="closeModal" class="w-8 h-8 rounded-lg bg-slate-700/50 hover:bg-slate-700 flex items-center justify-center transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-      
-      <form id="mensalidadeForm" class="space-y-4">
-        <input type="hidden" id="editId">
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Nome *</label>
-            <input 
-              type="text" 
-              id="inputNome"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Ex: João Silva"
-              required
-            >
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Valor *</label>
-            <input 
-              type="number" 
-              id="inputValor"
-              step="0.01"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0,00"
-              required
-            >
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Mês *</label>
-            <select 
-              id="inputMes"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-              <option value="">Selecione</option>
-              <option value="01">Janeiro</option>
-              <option value="02">Fevereiro</option>
-              <option value="03">Março</option>
-              <option value="04">Abril</option>
-              <option value="05">Maio</option>
-              <option value="06">Junho</option>
-              <option value="07">Julho</option>
-              <option value="08">Agosto</option>
-              <option value="09">Setembro</option>
-              <option value="10">Outubro</option>
-              <option value="11">Novembro</option>
-              <option value="12">Dezembro</option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Ano *</label>
-            <input 
-              type="number" 
-              id="inputAno"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="2024"
-              required
-            >
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-slate-300 mb-2">Vencimento *</label>
-            <input 
-              type="date" 
-              id="inputVencimento"
-              class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            >
-          </div>
-          
-          <div class="flex items-center pt-8">
-            <label class="flex items-center gap-3 cursor-pointer">
-              <input 
-                type="checkbox" 
-                id="inputPago"
-                class="w-5 h-5 rounded border-slate-700 cursor-pointer"
-              >
-              <span class="text-sm font-medium text-slate-300">Marcar como Pago</span>
-            </label>
-          </div>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-slate-300 mb-2">Descrição</label>
-          <textarea 
-            id="inputDescricao"
-            rows="3"
-            class="w-full px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-            placeholder="Observações sobre o pagamento..."
-          ></textarea>
-        </div>
-        
-        <div class="flex gap-3 pt-4">
-          <button type="button" id="cancelBtn" class="flex-1 px-4 py-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg font-medium transition">
-            Cancelar
-          </button>
-          <button type="submit" class="flex-1 btn-primary text-white px-4 py-3 rounded-lg font-medium">
-            Salvar
-          </button>
-        </div>
-      </form>
     </div>
-  </div>
 
-  <!-- Toast -->
-  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 glass rounded-xl px-6 py-4 shadow-2xl toast-animate max-w-sm">
-    <div class="flex items-center gap-3">
-      <div id="toastIcon" class="w-8 h-8 rounded-lg flex items-center justify-center"></div>
-      <div>
-        <p class="font-semibold text-white" id="toastTitle"></p>
-        <p class="text-sm text-slate-300" id="toastMessage"></p>
-      </div>
+    <!-- Main App -->
+    <div id="appScreen" class="hidden min-h-screen">
+        <!-- Header -->
+        <header class="glass-effect sticky top-0 z-40 border-b border-slate-700/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-wallet text-blue-400"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold">Controle de Mensalidades</h1>
+                            <div class="flex items-center gap-2 text-xs text-gray-400">
+                                <span id="userRole" class="px-2 py-0.5 rounded bg-slate-700"></span>
+                                <span class="flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-500 pulse-dot"></span>
+                                    Sincronizado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        id="logoutBtn"
+                        class="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 font-medium transition flex items-center gap-2"
+                    >
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Total Arrecadado</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPaid">R$ 0,00</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Pendente</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPending">R$ 0,00</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Total de Pessoas</p>
+                            <p class="text-2xl font-bold mt-1" id="totalPeople">0</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <i class="fas fa-users text-blue-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="glass-effect rounded-xl p-5 card-gradient">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-400 text-sm">Taxa de Pagamento</p>
+                            <p class="text-2xl font-bold mt-1" id="paymentRate">0%</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                            <i class="fas fa-chart-line text-purple-400 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="glass-effect rounded-xl p-4 mb-6">
+                <div class="flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex flex-wrap gap-2">
+                        <select id="monthFilter" class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500">
+                            <option value="all">Todos os meses</option>
+                        </select>
+                        
+                        <select id="statusFilter" class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500">
+                            <option value="all">Todos os status</option>
+                            <option value="paid">Pago</option>
+                            <option value="pending">Pendente</option>
+                            <option value="overdue">Atrasado</option>
+                        </select>
+                        
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Buscar pessoa..."
+                            class="px-4 py-2 rounded-lg bg-slate-800/50 border border-slate-700 text-white outline-none focus:border-blue-500 w-full sm:w-auto"
+                        >
+                    </div>
+                    
+                    <button 
+                        id="addPersonBtn"
+                        class="hidden px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium transition shadow-lg shadow-blue-500/30 flex items-center gap-2"
+                    >
+                        <i class="fas fa-plus"></i>
+                        <span class="hidden sm:inline">Adicionar Pessoa</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="glass-effect rounded-xl overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full">
+                        <thead class="bg-slate-800/50 border-b border-slate-700">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Nome</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Valor</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Mês</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Status</th>
+                                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-300">Vencimento</th>
+                                <th id="actionsHeader" class="hidden px-4 py-3 text-left text-sm font-semibold text-gray-300">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody" class="divide-y divide-slate-700/50">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="emptyState" class="hidden text-center py-12">
+                    <i class="fas fa-inbox text-4xl text-gray-600 mb-3"></i>
+                    <p class="text-gray-400">Nenhum registro encontrado</p>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
 
-<script>
-  // State
-  let currentUser = null;
-  let isAdmin = false;
-  let mensalidades = [];
-  let deferredPrompt = null;
-  
-  // Utils
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-  };
-  
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    const date = new Date(dateStr + 'T00:00:00');
-    return date.toLocaleDateString('pt-BR');
-  };
-  
-  const getMesNome = (mes) => {
-    const meses = {
-      '01': 'Jan', '02': 'Fev', '03': 'Mar', '04': 'Abr',
-      '05': 'Mai', '06': 'Jun', '07': 'Jul', '08': 'Ago',
-      '09': 'Set', '10': 'Out', '11': 'Nov', '12': 'Dez'
-    };
-    return meses[mes] || mes;
-  };
-  
-  const showToast = (title, message, type = 'success') => {
-    const toast = document.getElementById('toast');
-    const icon = document.getElementById('toastIcon');
-    const titleEl = document.getElementById('toastTitle');
-    const messageEl = document.getElementById('toastMessage');
-    
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    
-    if (type === 'success') {
-      icon.className = 'w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center';
-      icon.innerHTML = '<i data-lucide="check" class="w-5 h-5 text-green-400"></i>';
-    } else {
-      icon.className = 'w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center';
-      icon.innerHTML = '<i data-lucide="x" class="w-5 h-5 text-red-400"></i>';
-    }
-    
-    lucide.createIcons();
-    toast.classList.remove('hidden');
-    
-    setTimeout(() => {
-      toast.classList.add('hidden');
-    }, 3000);
-  };
-  
-  // Data Management
-  const saveData = () => {
-    localStorage.setItem('casa_mensalidades', JSON.stringify(mensalidades));
-  };
-  
-  const loadData = () => {
-    const data = localStorage.getItem('casa_mensalidades');
-    if (data) {
-      mensalidades = JSON.parse(data);
-    } else {
-      // Demo data
-      mensalidades = [
-        {
-          id: 1,
-          nome: 'Maria Silva',
-          descricao: 'Apartamento 101',
-          valor: 1500.00,
-          mes: '01',
-          ano: 2024,
-          vencimento: '2024-01-10',
-          pago: true
-        },
-        {
-          id: 2,
-          nome: 'João Santos',
-          descricao: 'Apartamento 202',
-          valor: 1800.00,
-          mes: '01',
-          ano: 2024,
-          vencimento: '2024-01-15',
-          pago: false
+    <!-- Add Person Modal -->
+    <div id="addPersonModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div class="glass-effect rounded-2xl p-6 w-full max-w-md fade-in">
+            <h2 class="text-2xl font-bold mb-4">Adicionar Pessoa</h2>
+            <form id="addPersonForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Nome</label>
+                    <input 
+                        type="text" 
+                        id="personName"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        placeholder="Nome completo"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Valor Mensal</label>
+                    <input 
+                        type="number" 
+                        id="monthlyValue"
+                        step="0.01"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        placeholder="0,00"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Mês de Referência</label>
+                    <input 
+                        type="month" 
+                        id="referenceMonth"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        required
+                    >
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2 text-gray-300">Data de Vencimento</label>
+                    <input 
+                        type="date" 
+                        id="dueDate"
+                        class="w-full px-4 py-3 rounded-lg bg-slate-800/50 border border-slate-700 focus:border-blue-500 outline-none transition text-white"
+                        required
+                    >
+                </div>
+                
+                <div class="flex gap-3 pt-2">
+                    <button 
+                        type="button"
+                        id="cancelAddBtn"
+                        class="flex-1 px-4 py-3 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium transition"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-medium transition"
+                    >
+                        Adicionar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getDatabase, ref, push, set, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+
+        // ========================================
+        // CONFIGURAÇÃO DO FIREBASE - SUBSTITUA AQUI
+        // ========================================
+        // Cole seu firebaseConfig aqui:
+       const firebaseConfig = {
+
+  apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
+
+  authDomain: "controle-pagamento-64984.firebaseapp.com",
+
+  databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
+
+  projectId: "controle-pagamento-64984",
+
+  storageBucket: "controle-pagamento-64984.firebasestorage.app",
+
+  messagingSenderId: "956557386879",
+
+  appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
+
+};
+
+
+        
+        // Senha de admin - ALTERE PARA SUA SENHA SEGURA
+        const ADMIN_PASSWORD = "sergio22"; // TROQUE ESTA SENHA EM PRODUÇÃO!
+        const READONLY_PASSWORD = "casa";
+        // ========================================
+
+        let app, db;
+        let isAdmin = false;
+        let payments = {};
+        let currentFilters = {
+            month: 'all',
+            status: 'all',
+            search: ''
+        };
+
+        // Initialize Firebase
+        function initFirebase() {
+            try {
+                if (FIREBASE_CONFIG.apiKey === "PASTE_YOUR_API_KEY") {
+                    throw new Error("Firebase não configurado");
+                }
+                app = initializeApp(FIREBASE_CONFIG);
+                db = getDatabase(app);
+                setupRealtimeListener();
+                showLogin();
+            } catch (error) {
+                document.getElementById('loadingScreen').innerHTML = `
+                    <div class="text-center max-w-md px-4">
+                        <i class="fas fa-exclamation-triangle text-4xl text-yellow-400 mb-4"></i>
+                        <h2 class="text-xl font-bold mb-2">Firebase não configurado</h2>
+                        <p class="text-gray-400 text-sm mb-4">Edite o código HTML e cole suas credenciais do Firebase na variável FIREBASE_CONFIG</p>
+                        <div class="glass-effect rounded-lg p-4 text-left text-xs">
+                            <p class="text-gray-300 mb-2">Localize no código:</p>
+                            <pre class="text-green-400 overflow-x-auto">const FIREBASE_CONFIG = { ... }</pre>
+                        </div>
+                    </div>
+                `;
+            }
         }
-      ];
-      saveData();
-    }
-  };
-  
-  // Auth
-  const checkAuth = () => {
-    const stored = sessionStorage.getItem('casa_auth');
-    if (stored) {
-      const auth = JSON.parse(stored);
-      currentUser = auth.user;
-      isAdmin = auth.role === 'admin';
-      showMainApp();
-    }
-  };
-  
-  const login = (password) => {
-    if (password === 'admin2026') {
-      currentUser = 'admin';
-      isAdmin = true;
-      sessionStorage.setItem('casa_auth', JSON.stringify({ user: 'admin', role: 'admin' }));
-      showMainApp();
-      return true;
-    } else if (password === 'casa') {
-      currentUser = 'viewer';
-      isAdmin = false;
-      sessionStorage.setItem('casa_auth', JSON.stringify({ user: 'viewer', role: 'viewer' }));
-      showMainApp();
-      return true;
-    }
-    return false;
-  };
-  
-  const logout = () => {
-    sessionStorage.removeItem('casa_auth');
-    currentUser = null;
-    isAdmin = false;
-    document.getElementById('mainApp').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('passwordInput').value = '';
-  };
-  
-  const showMainApp = () => {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('mainApp').classList.remove('hidden');
-    
-    document.getElementById('userRole').textContent = isAdmin ? 'Administrador' : 'Visualizador';
-    
-    if (isAdmin) {
-      document.getElementById('addBtn').classList.remove('hidden');
-      document.getElementById('exportBtn').classList.remove('hidden');
-    } else {
-      document.getElementById('actionsHeader').classList.add('hidden');
-    }
-    
-    loadData();
-    renderTable();
-    updateStats();
-  };
-  
-  // Table Rendering
-  const getFilteredData = () => {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const mes = document.getElementById('filterMes').value;
-    const ano = document.getElementById('filterAno').value;
-    const status = document.getElementById('filterStatus').value;
-    
-    return mensalidades.filter(m => {
-      const matchSearch = m.nome.toLowerCase().includes(search) || 
-                         (m.descricao && m.descricao.toLowerCase().includes(search));
-      const matchMes = !mes || m.mes === mes;
-      const matchAno = !ano || m.ano.toString() === ano;
-      const matchStatus = !status || 
-                         (status === 'pago' && m.pago) || 
-                         (status === 'pendente' && !m.pago);
-      
-      return matchSearch && matchMes && matchAno && matchStatus;
-    });
-  };
-  
-  const renderTable = () => {
-    const tbody = document.getElementById('tableBody');
-    const data = getFilteredData();
-    
-    if (data.length === 0) {
-      tbody.innerHTML = '';
-      document.getElementById('emptyState').classList.remove('hidden');
-      return;
-    }
-    
-    document.getElementById('emptyState').classList.add('hidden');
-    
-    tbody.innerHTML = data.map(m => `
-      <tr class="table-row">
-        <td class="px-6 py-4">
-          <div class="font-medium text-white">${m.nome}</div>
-        </td>
-        <td class="px-6 py-4">
-          <div class="text-sm text-slate-300">${m.descricao || '-'}</div>
-        </td>
-        <td class="px-6 py-4">
-          <div class="font-semibold text-white">${formatCurrency(m.valor)}</div>
-        </td>
-        <td class="px-6 py-4">
-          <div class="text-sm text-slate-300">${getMesNome(m.mes)}/${m.ano}</div>
-        </td>
-        <td class="px-6 py-4">
-          <div class="text-sm text-slate-300">${formatDate(m.vencimento)}</div>
-        </td>
-        <td class="px-6 py-4">
-          ${m.pago ? 
-            '<span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-green-500/10 text-green-400 text-xs font-medium"><i data-lucide="circle-check" class="w-3.5 h-3.5"></i> Pago</span>' :
-            '<span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-yellow-500/10 text-yellow-400 text-xs font-medium"><i data-lucide="clock" class="w-3.5 h-3.5"></i> Pendente</span>'
-          }
-        </td>
-        ${isAdmin ? `
-        <td class="px-6 py-4">
-          <div class="flex items-center justify-center gap-2">
-            <button onclick="togglePago(${m.id})" class="w-8 h-8 rounded-lg bg-slate-700/50 hover:bg-slate-700 flex items-center justify-center transition" title="${m.pago ? 'Marcar como pendente' : 'Marcar como pago'}">
-              <i data-lucide="${m.pago ? 'circle' : 'circle-check'}" class="w-4 h-4"></i>
-            </button>
-            <button onclick="editMensalidade(${m.id})" class="w-8 h-8 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 flex items-center justify-center transition" title="Editar">
-              <i data-lucide="pencil" class="w-4 h-4 text-blue-400"></i>
-            </button>
-            <button onclick="deleteMensalidade(${m.id})" class="w-8 h-8 rounded-lg bg-red-500/10 hover:bg-red-500/20 flex items-center justify-center transition" title="Excluir">
-              <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
-            </button>
-          </div>
-        </td>
-        ` : ''}
-      </tr>
-    `).join('');
-    
-    lucide.createIcons();
-  };
-  
-  const updateStats = () => {
-    const data = getFilteredData();
-    const total = data.reduce((sum, m) => sum + m.valor, 0);
-    const pagos = data.filter(m => m.pago).reduce((sum, m) => sum + m.valor, 0);
-    const pendentes = total - pagos;
-    
-    document.getElementById('totalGeral').textContent = formatCurrency(total);
-    document.getElementById('totalPagos').textContent = formatCurrency(pagos);
-    document.getElementById('totalPendentes').textContent = formatCurrency(pendentes);
-    document.getElementById('totalRegistros').textContent = data.length;
-  };
-  
-  // CRUD Operations
-  const openModal = (id = null) => {
-    const modal = document.getElementById('modal');
-    const form = document.getElementById('mensalidadeForm');
-    const title = document.getElementById('modalTitle');
-    
-    form.reset();
-    document.getElementById('editId').value = '';
-    
-    if (id) {
-      const m = mensalidades.find(x => x.id === id);
-      if (m) {
-        title.textContent = 'Editar Mensalidade';
-        document.getElementById('editId').value = m.id;
-        document.getElementById('inputNome').value = m.nome;
-        document.getElementById('inputDescricao').value = m.descricao || '';
-        document.getElementById('inputValor').value = m.valor;
-        document.getElementById('inputMes').value = m.mes;
-        document.getElementById('inputAno').value = m.ano;
-        document.getElementById('inputVencimento').value = m.vencimento;
-        document.getElementById('inputPago').checked = m.pago;
-      }
-    } else {
-      title.textContent = 'Nova Mensalidade';
-      document.getElementById('inputAno').value = new Date().getFullYear();
-    }
-    
-    modal.classList.remove('hidden');
-  };
-  
-  const closeModal = () => {
-    document.getElementById('modal').classList.add('hidden');
-  };
-  
-  const saveMensalidade = (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('editId').value;
-    const data = {
-      id: id ? parseInt(id) : Date.now(),
-      nome: document.getElementById('inputNome').value,
-      descricao: document.getElementById('inputDescricao').value,
-      valor: parseFloat(document.getElementById('inputValor').value),
-      mes: document.getElementById('inputMes').value,
-      ano: parseInt(document.getElementById('inputAno').value),
-      vencimento: document.getElementById('inputVencimento').value,
-      pago: document.getElementById('inputPago').checked
-    };
-    
-    if (id) {
-      const index = mensalidades.findIndex(m => m.id === parseInt(id));
-      mensalidades[index] = data;
-      showToast('Sucesso', 'Mensalidade atualizada com sucesso!');
-    } else {
-      mensalidades.push(data);
-      showToast('Sucesso', 'Mensalidade cadastrada com sucesso!');
-    }
-    
-    saveData();
-    renderTable();
-    updateStats();
-    closeModal();
-  };
-  
-  window.togglePago = (id) => {
-    const m = mensalidades.find(x => x.id === id);
-    if (m) {
-      m.pago = !m.pago;
-      saveData();
-      renderTable();
-      updateStats();
-      showToast('Sucesso', `Mensalidade marcada como ${m.pago ? 'paga' : 'pendente'}!`);
-    }
-  };
-  
-  window.editMensalidade = (id) => {
-    openModal(id);
-  };
-  
-  window.deleteMensalidade = (id) => {
-    if (confirm('Tem certeza que deseja excluir esta mensalidade?')) {
-      mensalidades = mensalidades.filter(m => m.id !== id);
-      saveData();
-      renderTable();
-      updateStats();
-      showToast('Sucesso', 'Mensalidade excluída com sucesso!');
-    }
-  };
-  
-  // Export
-  const exportCSV = () => {
-    const data = getFilteredData();
-    const headers = ['Nome', 'Descrição', 'Valor', 'Mês', 'Ano', 'Vencimento', 'Status'];
-    const rows = data.map(m => [
-      m.nome,
-      m.descricao || '',
-      m.valor.toFixed(2),
-      getMesNome(m.mes),
-      m.ano,
-      formatDate(m.vencimento),
-      m.pago ? 'Pago' : 'Pendente'
-    ]);
-    
-    let csv = headers.join(',') + '\n';
-    csv += rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `mensalidades_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    
-    showToast('Sucesso', 'Dados exportados com sucesso!');
-  };
-  
-  // PWA
-  const setupPWA = () => {
-    // Manifest
-    const manifest = {
-      name: 'Casa - Controle de Mensalidades',
-      short_name: 'Casa',
-      description: 'Sistema de controle de mensalidades',
-      start_url: '.',
-      display: 'standalone',
-      background_color: '#0f172a',
-      theme_color: '#0f172a',
-      icons: [
-        {
-          src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="100" fill="%233b82f6"/%3E%3Cpath d="M256 120 L140 220 L140 380 L220 380 L220 280 L292 280 L292 380 L372 220 Z" fill="white"/%3E%3C/svg%3E',
-          sizes: '512x512',
-          type: 'image/svg+xml'
+
+        // Auth
+        function handleLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                localStorage.setItem('userRole', 'admin');
+                showApp();
+            } else if (password === READONLY_PASSWORD) {
+                isAdmin = false;
+                localStorage.setItem('userRole', 'viewer');
+                showApp();
+            } else {
+                errorDiv.classList.remove('hidden');
+                setTimeout(() => errorDiv.classList.add('hidden'), 3000);
+            }
         }
-      ]
-    };
-    
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-    document.getElementById('manifest').href = URL.createObjectURL(manifestBlob);
-    
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      const sw = `
-        const CACHE_NAME = 'casa-v1';
-        self.addEventListener('install', e => self.skipWaiting());
-        self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-        self.addEventListener('fetch', e => {
-          e.respondWith(
-            caches.match(e.request).then(r => r || fetch(e.request))
-          );
+
+        function handleLogout() {
+            localStorage.removeItem('userRole');
+            isAdmin = false;
+            showLogin();
+        }
+
+        function checkAuth() {
+            const role = localStorage.getItem('userRole');
+            if (role) {
+                isAdmin = role === 'admin';
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        // UI State Management
+        function showLoading() {
+            document.getElementById('loadingScreen').classList.remove('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        function showApp() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            
+            document.getElementById('userRole').textContent = isAdmin ? 'Admin' : 'Visualizador';
+            
+            if (isAdmin) {
+                document.getElementById('addPersonBtn').classList.remove('hidden');
+                document.getElementById('actionsHeader').classList.remove('hidden');
+            }
+            
+            renderPayments();
+        }
+
+        // Firebase Operations
+        function setupRealtimeListener() {
+            const paymentsRef = ref(db, 'payments');
+            onValue(paymentsRef, (snapshot) => {
+                payments = snapshot.val() || {};
+                renderPayments();
+                updateStats();
+                populateMonthFilter();
+            });
+        }
+
+        async function addPayment(paymentData) {
+            const paymentsRef = ref(db, 'payments');
+            await push(paymentsRef, {
+                ...paymentData,
+                status: 'pending',
+                createdAt: Date.now()
+            });
+        }
+
+        async function updatePaymentStatus(id, status) {
+            const paymentRef = ref(db, `payments/${id}`);
+            await update(paymentRef, { status });
+        }
+
+        async function deletePayment(id) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                const paymentRef = ref(db, `payments/${id}`);
+                await remove(paymentRef);
+            }
+        }
+
+        // Rendering
+        function renderPayments() {
+            const tbody = document.getElementById('paymentsTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const filtered = filterPayments();
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map(([id, payment]) => {
+                const statusClass = {
+                    paid: 'status-paid',
+                    pending: 'status-pending',
+                    overdue: 'status-overdue'
+                }[payment.status] || 'status-pending';
+                
+                const statusIcon = {
+                    paid: 'fa-check-circle',
+                    pending: 'fa-clock',
+                    overdue: 'fa-exclamation-circle'
+                }[payment.status] || 'fa-clock';
+                
+                const dueDate = new Date(payment.dueDate);
+                const isOverdue = payment.status === 'pending' && dueDate < new Date();
+                const finalStatus = isOverdue ? 'overdue' : payment.status;
+                
+                return `
+                    <tr class="hover:bg-slate-800/30 transition">
+                        <td class="px-4 py-3">
+                            <div class="font-medium">${payment.name}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-semibold">R$ ${payment.value.toFixed(2).replace('.', ',')}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${formatMonth(payment.month)}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusClass}">
+                                <i class="fas ${statusIcon}"></i>
+                                ${getStatusLabel(finalStatus)}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-300">${formatDate(payment.dueDate)}</div>
+                        </td>
+                        ${isAdmin ? `
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                ${payment.status !== 'paid' ? `
+                                <button 
+                                    onclick="window.markAsPaid('${id}')"
+                                    class="px-3 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-green-400 text-sm transition"
+                                    title="Marcar como pago"
+                                >
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                ` : ''}
+                                <button 
+                                    onclick="window.deletePaymentRecord('${id}')"
+                                    class="px-3 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm transition"
+                                    title="Excluir"
+                                >
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                        ` : ''}
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterPayments() {
+            return Object.entries(payments).filter(([id, payment]) => {
+                const monthMatch = currentFilters.month === 'all' || payment.month === currentFilters.month;
+                const searchMatch = payment.name.toLowerCase().includes(currentFilters.search.toLowerCase());
+                
+                let statusMatch = true;
+                if (currentFilters.status !== 'all') {
+                    const dueDate = new Date(payment.dueDate);
+                    const isOverdue = payment.status === 'pending' && dueDate < new Date();
+                    const finalStatus = isOverdue ? 'overdue' : payment.status;
+                    statusMatch = finalStatus === currentFilters.status;
+                }
+                
+                return monthMatch && searchMatch && statusMatch;
+            }).sort((a, b) => b[1].createdAt - a[1].createdAt);
+        }
+
+        function updateStats() {
+            const allPayments = Object.values(payments);
+            let totalPaid = 0;
+            let totalPending = 0;
+            let paidCount = 0;
+            
+            allPayments.forEach(payment => {
+                if (payment.status === 'paid') {
+                    totalPaid += payment.value;
+                    paidCount++;
+                } else {
+                    totalPending += payment.value;
+                }
+            });
+            
+            const totalPeople = new Set(allPayments.map(p => p.name)).size;
+            const paymentRate = allPayments.length > 0 ? (paidCount / allPayments.length * 100).toFixed(0) : 0;
+            
+            document.getElementById('totalPaid').textContent = `R$ ${totalPaid.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalPending').textContent = `R$ ${totalPending.toFixed(2).replace('.', ',')}`;
+            document.getElementById('totalPeople').textContent = totalPeople;
+            document.getElementById('paymentRate').textContent = `${paymentRate}%`;
+        }
+
+        function populateMonthFilter() {
+            const months = new Set(Object.values(payments).map(p => p.month));
+            const select = document.getElementById('monthFilter');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="all">Todos os meses</option>' + 
+                Array.from(months).sort().reverse().map(month => 
+                    `<option value="${month}">${formatMonth(month)}</option>`
+                ).join('');
+            
+            select.value = currentValue;
+        }
+
+        // Helpers
+        function formatMonth(monthStr) {
+            const [year, month] = monthStr.split('-');
+            const date = new Date(year, month - 1);
+            return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function getStatusLabel(status) {
+            return {
+                paid: 'Pago',
+                pending: 'Pendente',
+                overdue: 'Atrasado'
+            }[status] || 'Pendente';
+        }
+
+        // Event Listeners
+        document.getElementById('loginForm').addEventListener('submit', handleLogin);
+        document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+        
+        document.getElementById('addPersonBtn').addEventListener('click', () => {
+            document.getElementById('addPersonModal').classList.remove('hidden');
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('referenceMonth').value = today.substring(0, 7);
+            document.getElementById('dueDate').value = today;
         });
-      `;
-      
-      const swBlob = new Blob([sw], { type: 'text/javascript' });
-      const swUrl = URL.createObjectURL(swBlob);
-      navigator.serviceWorker.register(swUrl);
-    }
-    
-    // Install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installBtn').classList.remove('hidden');
-    });
-    
-    document.getElementById('installBtn').addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        await deferredPrompt.userChoice;
-        deferredPrompt = null;
-        document.getElementById('installBtn').classList.add('hidden');
-      }
-    });
-  };
-  
-  // Event Listeners
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const password = document.getElementById('passwordInput').value;
-    if (!login(password)) {
-      document.getElementById('loginError').classList.remove('hidden');
-      setTimeout(() => {
-        document.getElementById('loginError').classList.add('hidden');
-      }, 3000);
-    }
-  });
-  
-  document.getElementById('logoutBtn').addEventListener('click', logout);
-  document.getElementById('addBtn').addEventListener('click', () => openModal());
-  document.getElementById('closeModal').addEventListener('click', closeModal);
-  document.getElementById('cancelBtn').addEventListener('click', closeModal);
-  document.getElementById('mensalidadeForm').addEventListener('submit', saveMensalidade);
-  document.getElementById('exportBtn').addEventListener('click', exportCSV);
-  
-  // Filters
-  ['searchInput', 'filterMes', 'filterAno', 'filterStatus'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-      renderTable();
-      updateStats();
-    });
-  });
-  
-  // Init
-  lucide.createIcons();
-  setupPWA();
-  checkAuth();
-</script>
+        
+        document.getElementById('cancelAddBtn').addEventListener('click', () => {
+            document.getElementById('addPersonModal').classList.add('hidden');
+            document.getElementById('addPersonForm').reset();
+        });
+        
+        document.getElementById('addPersonForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('personName').value,
+                value: parseFloat(document.getElementById('monthlyValue').value),
+                month: document.getElementById('referenceMonth').value,
+                dueDate: document.getElementById('dueDate').value
+            };
+            await addPayment(data);
+            document.getElementById('addPersonModal').classList.add('hidden');
+            document.getElementById('addPersonForm').reset();
+        });
+        
+        document.getElementById('monthFilter').addEventListener('change', (e) => {
+            currentFilters.month = e.target.value;
+            renderPayments();
+        });
+        
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            currentFilters.status = e.target.value;
+            renderPayments();
+        });
+        
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            currentFilters.search = e.target.value;
+            renderPayments();
+        });
 
+        // Global functions for inline onclick
+        window.markAsPaid = async (id) => {
+            await updatePaymentStatus(id, 'paid');
+        };
+        
+        window.deletePaymentRecord = async (id) => {
+            await deletePayment(id);
+        };
+
+        // PWA Service Worker
+        if ('serviceWorker' in navigator) {
+            const sw = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
+            `;
+            const blob = new Blob([sw], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(swUrl);
+        }
+
+        // Init
+        initFirebase();
+    </script>
 </body>
 </html>
