@@ -1,40 +1,102 @@
+# Controle de Pagamentos Profissional
+
+```html
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Teste Firebase</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Pagamentos</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
-<body>
-    <h1 id="status">Conectando...</h1>
-    
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
-            authDomain: "controle-pagamento-64984.firebaseapp.com",
-            databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
-            projectId: "controle-pagamento-64984",
-            storageBucket: "controle-pagamento-64984.firebasestorage.app",
-            messagingSenderId: "956557386879",
-            appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
-        };
+<body class="bg-slate-100 min-h-screen">
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getDatabase(app);
-            
-            // Testa escrever
-            await set(ref(db, 'teste'), 'funcionou');
-            
-            // Testa ler
-            const snapshot = await get(ref(db, 'teste'));
-            document.getElementById('status').innerText = 'Firebase OK: ' + snapshot.val();
-            
-        } catch (error) {
-            document.getElementById('status').innerText = 'Erro: ' + error.message;
-            console.error(error);
-        }
-    </script>
-</body>
-</html>
+  <!-- LOGIN -->
+  <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 fade-in">
+
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-slate-800 mb-2">
+          Controle de Pagamentos
+        </h1>
+        <p class="text-slate-500">
+          Sistema financeiro simplificado
+        </p>
+      </div>
+
+      <div class="space-y-4">
+        <input
+          type="password"
+          id="senha"
+          placeholder="Digite sua senha"
+          class="w-full p-4 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none"
+        />
+
+        <button
+          onclick="login()"
+          class="w-full bg-blue-600 hover:bg-blue-700 transition text-white p-4 rounded-xl font-semibold"
+        >
+          Entrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SISTEMA -->
+  <div id="mainScreen" class="hidden">
+
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">
+            Controle de Pagamentos
+          </h1>
+          <p class="text-sm text-slate-500">
+            Painel financeiro
+          </p>
+        </div>
+
+        <button
+          onclick="logout()"
+          class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-semibold transition"
+        >
+          Sair
+        </button>
+
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6">
+
+      <!-- DASHBOARD -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <div class="bg-white rounded-2xl sha
+```
