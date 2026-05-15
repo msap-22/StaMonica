@@ -3,18 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Pagamento</title>
+    <title>Controle de Pagamento - Sta Mônica</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
     <!-- LOGIN -->
-    <div id="loginScreen" class="flex items-center justify-center min-h-screen">
-        <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-sm">
-            <h1 class="text-3xl font-bold mb-6 text-center text-slate-800">Controle de Pagamento</h1>
+    <div id="loginScreen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
+                    <i class="fas fa-wallet text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-slate-800">Controle de Pagamento</h1>
+                <p class="text-slate-500 mt-2">Acesse sua conta</p>
+            </div>
             <input type="password" id="senha" placeholder="Digite a senha" 
-                   class="w-full p-3 border border-slate-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                   class="w-full p-4 border border-slate-300 rounded-xl mb-4 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
             <button onclick="login()" 
-                    class="w-full bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    class="w-full bg-blue-600 text-white p-4 rounded-xl font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-500/30">
                 Entrar
             </button>
             <p id="erroLogin" class="text-red-500 text-sm mt-3 text-center hidden">Senha incorreta</p>
@@ -23,172 +34,33 @@
 
     <!-- PRINCIPAL -->
     <div id="mainScreen" class="hidden">
-        <header class="bg-white shadow-md">
-            <div class="max-w-5xl mx-auto p-4 flex justify-between items-center">
-                <h1 class="text-2xl font-bold text-slate-800">Controle de Pagamento</h1>
-                <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition">
-                    Sair
-                </button>
+        <!-- HEADER -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-wallet text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-slate-800">Controle de Pagamento</h1>
+                            <p class="text-xs text-slate-500">Gestão financeira</p>
+                        </div>
+                    <button onclick="logout()" class="flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-xl font-medium hover:bg-slate-200 transition">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                </div>
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto p-4 mt-6">
-            <!-- FORM ADMIN -->
-            <div id="adminForm" class="hidden bg-white p-6 rounded-xl shadow-lg mb-6">
-                <h2 class="text-xl font-bold mb-4 text-slate-700">Adicionar Novo Pagamento</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input type="text" id="nome" placeholder="Nome da pessoa" 
-                           class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    
-                    <select id="mes" class="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="">Selecione o mês</option>
-                        <option>Janeiro</option><option>Fevereiro</option><option>Março</option>
-                        <option>Abril</option><option>Maio</option><option>Junho</option>
-                        <option>Julho</option><option>Agosto</option><option>Setembro</option>
-                        <option>Outubro</option><option>Novembro</option><option>Dezembro</option>
-                    </select>
-                    
-                    <button onclick="adicionar()" 
-                            class="bg-green-500 text-white p-3 rounded-lg font-semibold hover:bg-green-600 transition">
-                        Adicionar
-                    </button>
-                </div>
-                <p class="text-sm text-slate-500 mt-2">Valor fixo: R$ 100,00</p>
-            </div>
-
-            <!-- LISTA -->
-            <div class="bg-white rounded-xl shadow-lg">
-                <div class="p-4 border-b border-slate-200">
-                    <h2 class="text-xl font-bold text-slate-700">Lista de Pagamentos</h2>
-                </div>
-                <div id="lista" class="divide-y divide-slate-200"></div>
-            </div>
-        </main>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-        import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
-            authDomain: "controle-pagamento-64984.firebaseapp.com",
-            databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
-            projectId: "controle-pagamento-64984",
-            storageBucket: "controle-pagamento-64984.firebasestorage.app",
-            messagingSenderId: "956557386879",
-            appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        let isAdmin = false;
-        const VALOR_FIXO = 100.00;
-
-        window.login = function() {
-            const senha = document.getElementById('senha').value;
-            if (senha === 'admin2026') {
-                isAdmin = true;
-                mostrarTela();
-            } else if (senha === 'casa') {
-                isAdmin = false;
-                mostrarTela();
-            } else {
-                document.getElementById('erroLogin').classList.remove('hidden');
-            }
-        }
-
-        function mostrarTela() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainScreen').classList.remove('hidden');
-            if (isAdmin) document.getElementById('adminForm').classList.remove('hidden');
-            carregarDados();
-        }
-
-        window.logout = function() {
-            location.reload();
-        }
-
-        window.adicionar = function() {
-            const nome = document.getElementById('nome').value;
-            const mes = document.getElementById('mes').value;
-            
-            if (!nome || !mes) {
-                alert('Preencha nome e mês');
-                return;
-            }
-            
-            push(ref(db, 'pagamentos'), {
-                nome: nome,
-                valor: VALOR_FIXO,
-                mes: mes,
-                pago: false,
-                data: Date.now()
-            });
-            
-            document.getElementById('nome').value = '';
-            document.getElementById('mes').value = '';
-        }
-
-        function carregarDados() {
-            onValue(ref(db, 'pagamentos'), (snapshot) => {
-                const lista = document.getElementById('lista');
-                lista.innerHTML = '';
-                
-                if (!snapshot.exists()) {
-                    lista.innerHTML = '<p class="p-6 text-center text-slate-500">Nenhum pagamento cadastrado</p>';
-                    return;
-                }
-                
-                snapshot.forEach((child) => {
-                    const id = child.key;
-                    const dados = child.val();
-                    
-                    const div = document.createElement('div');
-                    div.className = 'p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:bg-slate-50 transition';
-                    
-                    let botoesAdmin = '';
-                    if (isAdmin) {
-                        botoesAdmin = `
-                            <div class="flex gap-2">
-                                <button onclick="togglePago('${id}', ${!dados.pago})" 
-                                        class="px-4 py-2 rounded-lg text-sm font-semibold ${dados.pago ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-blue-500 text-white hover:bg-blue-600'} transition">
-                                    ${dados.pago ? 'Desmarcar' : 'Marcar Pago'}
-                                </button>
-                                <button onclick="excluir('${id}')" 
-                                        class="bg-slate-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-slate-600 transition">
-                                    Excluir
-                                </button>
-                            </div>
-                        `;
-                    }
-                    
-                    div.innerHTML = `
-                        <div class="flex-1">
-                            <p class="font-bold text-lg text-slate-800">${dados.nome}</p>
-                            <p class="text-sm text-slate-600">${dados.mes} - R$ ${dados.valor.toFixed(2)}</p>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- CARDS DE RESUMO -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-slate-500 font-medium">Total de Participantes</p>
+                            <p id="totalParticipantes" class="text-3xl font-bold text-slate-800 mt-2">0</p>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <span class="px-4 py-2 rounded-full text-sm font-bold ${dados.pago ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                ${dados.pago ? '✓ Pago' : 'Pendente'}
-                            </span>
-                            ${botoesAdmin}
-                        </div>
-                    `;
-                    lista.appendChild(div);
-                });
-            });
-        }
-
-        window.togglePago = function(id, status) {
-            update(ref(db, 'pagamentos/' + id), { pago: status });
-        }
-
-        window.excluir = function(id) {
-            if (confirm('Tem certeza que deseja excluir este pagamento?')) {
-                remove(ref(db, 'pagamentos/' + id));
-            }
-        }
-    </script>
-</body>
-</html>
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl
