@@ -96,4 +96,214 @@
             </div>
 
             <!-- FORM ADMIN -->
-            <div id="adminForm"
+            <div id="adminForm" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-blue-600"></i>
+                    Adicionar Novo Participante
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="nome" placeholder="Nome completo" 
+                           class="p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                    
+                    <select id="mes" class="p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        <option value="">Selecione o mês</option>
+                        <option>Janeiro</option><option>Fevereiro</option><option>Março</option>
+                        <option>Abril</option><option>Maio</option><option>Junho</option>
+                        <option>Julho</option><option>Agosto</option><option>Setembro</option>
+                        <option>Outubro</option><option>Novembro</option><option>Dezembro</option>
+                    </select>
+                    
+                    <button id="btnAdicionar" 
+                            class="bg-blue-600 text-white p-3 rounded-xl font-semibold hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        Adicionar
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500 mt-3 flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    Valor fixo por participante: R$ 100,00
+                </p>
+            </div>
+
+            <!-- LISTA -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200">
+                <div class="p-6 border-b border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-list text-blue-600"></i>
+                        Lista de Participantes
+                    </h2>
+                </div>
+                <div id="lista" class="divide-y divide-slate-100"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
+        import { getDatabase, ref, push, onValue, remove, update } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAgEcWE25kHj9xMhJi9T15G1SFiXCA9GGA",
+            authDomain: "controle-pagamento-64984.firebaseapp.com",
+            databaseURL: "https://controle-pagamento-64984-default-rtdb.firebaseio.com",
+            projectId: "controle-pagamento-64984",
+            storageBucket: "controle-pagamento-64984.firebasestorage.app",
+            messagingSenderId: "956557386879",
+            appId: "1:956557386879:web:0270de5102cbf950f1cb4a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let isAdmin = false;
+        const VALOR_FIXO = 100.00;
+
+        // LOGIN - AGORA COM addEventListener
+        document.getElementById('btnLogin').addEventListener('click', login);
+        document.getElementById('senha').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        function login() {
+            const senha = document.getElementById('senha').value;
+            if (senha === 'admin2026') {
+                isAdmin = true;
+                mostrarTela();
+            } else if (senha === 'casa') {
+                isAdmin = false;
+                mostrarTela();
+            } else {
+                document.getElementById('erroLogin').classList.remove('hidden');
+            }
+        }
+
+        function mostrarTela() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+            if (isAdmin) document.getElementById('adminForm').classList.remove('hidden');
+            carregarDados();
+        }
+
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            location.reload();
+        });
+
+        document.getElementById('btnAdicionar').addEventListener('click', adicionar);
+
+        function adicionar() {
+            const nome = document.getElementById('nome').value;
+            const mes = document.getElementById('mes').value;
+            
+            if (!nome || !mes) {
+                alert('Preencha nome e mês');
+                return;
+            }
+            
+            push(ref(db, 'pagamentos'), {
+                nome: nome,
+                valor: VALOR_FIXO,
+                mes: mes,
+                pago: false,
+                data: Date.now()
+            });
+            
+            document.getElementById('nome').value = '';
+            document.getElementById('mes').value = '';
+        }
+
+        function carregarDados() {
+            onValue(ref(db, 'pagamentos'), (snapshot) => {
+                const lista = document.getElementById('lista');
+                lista.innerHTML = '';
+                
+                let totalParticipantes = 0;
+                let totalPagos = 0;
+                let totalArrecadado = 0;
+                
+                if (!snapshot.exists()) {
+                    lista.innerHTML = `
+                        <div class="p-12 text-center">
+                            <i class="fas fa-inbox text-slate-300 text-5xl mb-4"></i>
+                            <p class="text-slate-500">Nenhum participante cadastrado</p>
+                        </div>
+                    `;
+                    atualizarCards(0, 0, 0);
+                    return;
+                }
+                
+                snapshot.forEach((child) => {
+                    const id = child.key;
+                    const dados = child.val();
+                    totalParticipantes++;
+                    
+                    if (dados.pago) {
+                        totalPagos++;
+                        totalArrecadado += dados.valor;
+                    }
+                    
+                    const div = document.createElement('div');
+                    div.className = 'p-6 hover:bg-slate-50 transition';
+                    
+                    let botoesAdmin = '';
+                    if (isAdmin) {
+                        botoesAdmin = `
+                            <div class="flex gap-2">
+                                <button onclick="window.togglePago('${id}', ${!dados.pago})" 
+                                        class="px-4 py-2 rounded-xl text-sm font-semibold transition ${dados.pago ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-blue-600 text-white hover:bg-blue-700'}">
+                                    <i class="fas ${dados.pago ? 'fa-undo' : 'fa-check'} mr-1"></i>
+                                    ${dados.pago ? 'Desmarcar' : 'Confirmar'}
+                                </button>
+                                <button onclick="window.excluir('${id}')" 
+                                        class="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                    
+                    div.innerHTML = `
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center">
+                                        <i class="fas fa-user text-slate-600"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-slate-800">${dados.nome}</p>
+                                        <p class="text-sm text-slate-500">${dados.mes} • R$ ${dados.valor.toFixed(2)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 w-full sm:w-auto">
+                                <span class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-bold text-center ${dados.pago ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">
+                                    <i class="fas ${dados.pago ? 'fa-check-circle' : 'fa-clock'} mr-1"></i>
+                                    ${dados.pago ? 'Pago' : 'Pendente'}
+                                </span>
+                                ${botoesAdmin}
+                            </div>
+                        </div>
+                    `;
+                    lista.appendChild(div);
+                });
+                
+                atualizarCards(totalParticipantes, totalPagos, totalArrecadado);
+            });
+        }
+
+        function atualizarCards(participantes, pagos, arrecadado) {
+            document.getElementById('totalParticipantes').textContent = participantes;
+            document.getElementById('totalPagos').textContent = pagos;
+            document.getElementById('totalArrecadado').textContent = `R$ ${arrecadado.toFixed(2)}`;
+        }
+
+        window.togglePago = function(id, status) {
+            update(ref(db, 'pagamentos/' + id), { pago: status });
+        }
+
+        window.excluir = function(id) {
+            if (confirm('Tem certeza que deseja excluir este participante?')) {
+                remove(ref(db, 'pagamentos/' + id));
+            }
+        }
+    </script>
+</body>
+</html>
